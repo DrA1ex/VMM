@@ -52,9 +52,6 @@
     <Reference Include="System.Xaml">
       <RequiredTargetFramework>4.0</RequiredTargetFramework>
     </Reference>
-    <Reference Include="VkNet">
-      <HintPath>..\packages\VkNet.1.0.1\lib\VkNet.dll</HintPath>
-    </Reference>
     <Reference Include="WindowsBase" />
     <Reference Include="PresentationCore" />
     <Reference Include="PresentationFramework" />
@@ -144,7 +141,10 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="VkNet.XML" />
+    <ProjectReference Include="..\VkNet\VkNet.csproj">
+      <Project>{8b031a92-84d4-4418-8551-18f1afeecc6c}</Project>
+      <Name>VkNet</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
