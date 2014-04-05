@@ -1,0 +1,37 @@
+﻿<UserControl x:Class="VMM.Content.View.Login"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
+             mc:Ignorable="d" d:DataContext="{d:DesignInstance {x:Type viewModel:LoginViewModel}}"
+             d:DesignHeight="300" d:DesignWidth="300">
+    <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInverter}}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+        </Grid.ColumnDefinitions>
+
+        <ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" IsIndeterminate="True"
+                     VerticalAlignment="Top" />
+
+        <TextBlock Grid.Row="0" Text="Вход" Style="{StaticResource Heading2}" Margin="3" HorizontalAlignment="Center" />
+
+        <TextBlock Grid.Row="1" Text="Логин" Margin="3" />
+        <TextBox Grid.Row="2" Margin="3" Text="{Binding Email}" />
+
+        <TextBlock Grid.Row="3" Text="Пароль" Margin="3" />
+        <PasswordBox x:Name="PasswordBox" Grid.Row="4" Margin="3" />
+
+        <Button Grid.Row="5" Content="Вход" HorizontalAlignment="Right" Margin="5" Command="{Binding LoginCommand}"
+                IsDefault="True" />
+    </Grid>
+</UserControl>
