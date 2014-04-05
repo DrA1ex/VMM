@@ -59,7 +59,7 @@ namespace VMM.Content.ViewModel
                              }
                              catch (Exception e)
                              {
-                                 Trace.WriteLine(String.Format("While saving file: {0}", e.Message));
+                                 Trace.WriteLine(String.Format("While saving file: {0}", e));
                              }
                              finally
                              {

@@ -28,7 +28,7 @@ namespace VMM.Model
                             }
                             catch (Exception e)
                             {
-                                Trace.WriteLine(String.Format("Unable to deserialize vault {0}. {1}", stream.Name, e.Message));
+                                Trace.WriteLine(String.Format("Unable to deserialize vault {0}. {1}", stream.Name, e));
                             }
                         }
                     }
@@ -36,7 +36,7 @@ namespace VMM.Model
             }
             catch (Exception e)
             {
-                Trace.WriteLine(String.Format("Unable to open vault: {0}", e.Message));
+                Trace.WriteLine(String.Format("Unable to open vault: {0}", e));
             }
 
 
@@ -59,14 +59,14 @@ namespace VMM.Model
                         }
                         catch (Exception e)
                         {
-                            Trace.WriteLine(String.Format("Unable to serialize vault {0}. {1}", stream.Name, e.Message));
+                            Trace.WriteLine(String.Format("Unable to serialize vault {0}. {1}", stream.Name, e));
                         }
                     }
                 }
             }
             catch (Exception e)
             {
-                Trace.WriteLine(String.Format("Unable to open vault: {0}", e.Message));
+                Trace.WriteLine(String.Format("Unable to open vault: {0}", e));
             }
         }
     }
