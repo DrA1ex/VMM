@@ -7,6 +7,7 @@ namespace VMM.Model
 {
     public class MusicEntry : INotifyPropertyChanged
     {
+        private bool _isDeleted;
         private bool _modified;
         public long Id { get; set; }
 
@@ -21,6 +22,17 @@ namespace VMM.Model
         public int Duration { get; set; }
 
         public Uri Url { get; set; }
+
+
+        public bool IsDeleted
+        {
+            get { return _isDeleted; }
+            set
+            {
+                _isDeleted = value;
+                OnPropertyChanged("IsDeleted");
+            }
+        }
 
 
         public bool Modified

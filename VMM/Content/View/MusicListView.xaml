@@ -16,7 +16,7 @@
         <ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" IsIndeterminate="True"
                      VerticalAlignment="Top" />
 
-        <ListView Grid.Row="1" ItemsSource="{Binding Music}" SelectionMode="Extended"
+        <ListView x:Name="MusciView" Grid.Row="1" ItemsSource="{Binding Music}" SelectionMode="Extended" SelectedItem="{Binding SelectedSong}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ItemContainerStyle>
                 <Style TargetType="ListViewItem">

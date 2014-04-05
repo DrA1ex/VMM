@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
+using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -35,6 +36,7 @@ namespace VMM.Content.ViewModel
             }
         }
 
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void SaveSong(MusicEntry song)
@@ -55,7 +57,7 @@ namespace VMM.Content.ViewModel
                          {
                              try
                              {
-                                 var client = Vk.Instance.Client;
+                                 WebClient client = Vk.Instance.Client;
                                  lock (client)
                                  {
                                      client.DownloadFile(song.Url, dlg.FileName);

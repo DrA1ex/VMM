@@ -5,6 +5,8 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:model="clr-namespace:VMM.Model"
              xmlns:view="clr-namespace:VMM.Content.View"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -12,9 +14,30 @@
         <Separator BorderThickness="1" BorderBrush="{StaticResource Accent}" VerticalAlignment="Top" />
 
         <Grid Style="{StaticResource ContentRoot}">
-            <Grid
-                Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
-                <view:MusicListView />
+            <Grid Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
+                <Grid.RowDefinitions>
+                    <RowDefinition/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <view:MusicListView x:Name="MusicList" d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}"/>
+
+                <DockPanel Grid.Row="1" HorizontalAlignment="Right" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolInverter}}">
+                    <DockPanel.Resources>
+                        <Style TargetType="{x:Type mui:ModernButton}">
+                            <Setter Property="Margin" Value="5"/>
+                            <Setter Property="EllipseDiameter" Value="24"/>
+                            <Setter Property="IconHeight" Value="14"/>
+                            <Setter Property="IconWidth" Value="14"/>
+                        </Style>
+                    </DockPanel.Resources>
+                    <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}"/>
+                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"/>
+                    <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}" Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}"/>
+
+                    <mui:ModernButton IconData="{StaticResource UpIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveUpCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }"/>
+                    <mui:ModernButton IconData="{StaticResource DownIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveDownCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }"/>
+                </DockPanel>
             </Grid>
 
             <TextBlock

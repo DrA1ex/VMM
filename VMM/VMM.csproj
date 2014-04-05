@@ -108,6 +108,8 @@
     <Compile Include="Converters\BooleanInverter.cs" />
     <Compile Include="Converters\BoolToVisibleConverter.cs" />
     <Compile Include="Converters\DurationConverter.cs" />
+    <Compile Include="Converters\IsRemovedToBrush.cs" />
+    <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToVisibleConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToTextConverter.cs" />
     <Compile Include="Helper\DelegateCommand.cs" />
@@ -125,6 +127,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Model\MusicEntry.cs" />
+    <Compile Include="Model\MusicListChange.cs" />
     <Compile Include="Model\SettingsVault.cs" />
     <Compile Include="Model\Vk.cs" />
     <Compile Include="Pages\Authorization.xaml.cs">
