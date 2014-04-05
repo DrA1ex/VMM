@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using VkNet.Enums;
@@ -120,16 +120,19 @@ namespace VMM.Content.ViewModel
                                           foreach (Audio musicEntry in musicList)
                                           {
                                               Audio song = musicEntry;
-                                              disp.BeginInvoke(new Action(() => Music.Add(new MusicEntry
-                                                                                          {
-                                                                                              Id = song.Id,
-                                                                                              Artist = song.Artist,
-                                                                                              Name = song.Title,
-                                                                                              Genre = song.Genre ?? AudioGenre.Other,
-                                                                                              Duration = song.Duration,
-                                                                                              Url = song.Url,
-                                                                                              AlbumId = song.AlbumId
-                                                                                          })));
+
+                                              var entry = new MusicEntry
+                                                          {
+                                                              Id = song.Id,
+                                                              Artist = song.Artist,
+                                                              Name = song.Title,
+                                                              Genre = song.Genre ?? AudioGenre.Other,
+                                                              Duration = song.Duration,
+                                                              Url = song.Url,
+                                                              AlbumId = song.AlbumId
+                                                          };
+
+                                              disp.BeginInvoke(new Action(() => Music.Add(entry)));
                                           }
                                       }
                                       finally
@@ -150,8 +153,6 @@ namespace VMM.Content.ViewModel
                 if (index != 0)
                 {
                     Music.Move(index, newPosition);
-                    ChangesList.Add(new MusicListChange { ChangeType = ChangeType.Moved, Data = new MovedSong { SongId = SelectedSong.Id, Position = newPosition } });
-
                     IsModified = true;
                 }
             }
@@ -167,8 +168,6 @@ namespace VMM.Content.ViewModel
                 if (index < Music.Count - 1)
                 {
                     Music.Move(index, newPosition);
-                    ChangesList.Add(new MusicListChange { ChangeType = ChangeType.Moved, Data = new MovedSong { SongId = SelectedSong.Id, Position = newPosition } });
-
                     IsModified = true;
                 }
             }
@@ -176,6 +175,10 @@ namespace VMM.Content.ViewModel
 
         private void Remove(MusicEntry song)
         {
+            if (IsBusy)
+                return;
+
+
             song.IsDeleted = !song.IsDeleted;
 
             if (song.IsDeleted)
@@ -185,24 +188,64 @@ namespace VMM.Content.ViewModel
             }
             else
             {
-                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && c.Data is DeleteSong && ((DeleteSong)c.Data).SongId == song.Id);
-
-                IsModified = ChangesList.Any();
+                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong)c.Data).SongId == song.Id);
             }
         }
 
         private void Sort()
         {
-            MessageBox.Show("Not implemented");
+            List<MusicEntry> copyMusic = Music.ToList();
+            Music.Clear();
 
-            IsModified = ChangesList.Any();
+            IsBusy = true;
+            Dispatcher disp = Dispatcher.CurrentDispatcher;
+
+            Task.Run(() =>
+                     {
+                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c.AlbumId ?? 0).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+
+                         foreach (MusicEntry musicEntry in sorted)
+                         {
+                             MusicEntry entry = musicEntry;
+                             disp.BeginInvoke(new Action(() => Music.Add(entry)));
+                         }
+
+                         disp.Invoke(() => { IsBusy = false; });
+                     });
+
+            IsModified = true;
         }
 
         private void SaveChanges()
         {
-            MessageBox.Show("Not implemented");
+            IsBusy = true;
+            Dispatcher disp = Dispatcher.CurrentDispatcher;
 
-            IsModified = false;
+            Task.Run(() =>
+                     {
+                         try
+                         {
+                             for (int i = 0; i < Music.Count; i++)
+                             {
+                                 MusicEntry entry = Music[i];
+                                 long previosId = i != 0 ? Music[i - 1].Id : 0;
+                                 long nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
+
+                                 Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, previosId, nextId);
+                                 Thread.Sleep(340); //Allowed only 3 request per second
+                             }
+
+                             foreach (MusicListChange change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
+                             {
+                                 Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
+                             }
+                         }
+                         finally
+                         {
+                             disp.Invoke(() => { IsBusy = false; });
+                             disp.BeginInvoke(new Action(Refresh));
+                         }
+                     });
         }
 
         [NotifyPropertyChangedInvocator]

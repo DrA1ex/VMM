@@ -2,7 +2,7 @@
 {
     public enum ChangeType
     {
-        Deleted, Moved
+        Deleted, Edited
     }
 
     public class MusicListChange
@@ -14,13 +14,6 @@
     public class DeleteSong
     {
         public long SongId { get; set; }
-    }
-
-    public class MovedSong
-    {
-        public long SongId { get; set; }
-
-        public long Position { get; set; }
     }
 
 }
