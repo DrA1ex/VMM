@@ -49,7 +49,7 @@ namespace VMM.Content.ViewModel
             if (dlg.ShowDialog(Application.Current.MainWindow) == true)
             {
                 SavingInProgress = true;
-                var disp = Dispatcher.CurrentDispatcher;
+                Dispatcher disp = Dispatcher.CurrentDispatcher;
 
                 Task.Run(() =>
                          {

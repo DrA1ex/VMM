@@ -9,7 +9,7 @@ namespace VMM
 {
     public partial class App
     {
-        App()
+        private App()
         {
             DispatcherUnhandledException += AppDispatcherUnhandledException;
             TaskScheduler.UnobservedTaskException += TaskSchedulerOnUnobservedTaskException;
@@ -22,12 +22,11 @@ namespace VMM
             ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK);
         }
 
-        void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
+        private void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
             Trace.WriteLine(String.Format("Unhandeled exception: {0}", e.Exception));
 
             ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK);
         }
-
     }
 }

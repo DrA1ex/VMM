@@ -28,9 +28,11 @@
         </Grid.RowDefinitions>
 
         <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="14" IconWidth="14"
-                          IconData="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolToIcon}}" VerticalAlignment="Center" Margin="3"
+                          IconData="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolToIcon}}"
+                          VerticalAlignment="Center" Margin="3"
                           Command="{Binding Path=DataContext.SaveSongCommand, ElementName=Self}"
-                          CommandParameter="{Binding .}" IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}"/>
+                          CommandParameter="{Binding .}"
+                          IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}" />
 
         <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource Accent}"
                    Grid.Row="0"

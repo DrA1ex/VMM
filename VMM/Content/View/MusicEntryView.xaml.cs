@@ -1,5 +1,4 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using VMM.Content.ViewModel;
 
 namespace VMM.Content.View
@@ -8,16 +7,16 @@ namespace VMM.Content.View
     {
         private MusicEntryViewModel _model;
 
-        public MusicEntryViewModel Model
-        {
-            get { return _model ?? (_model = new MusicEntryViewModel()); }
-        }
-
         public MusicEntryView()
         {
             InitializeComponent();
 
             Loaded += ControlLoaded;
+        }
+
+        public MusicEntryViewModel Model
+        {
+            get { return _model ?? (_model = new MusicEntryViewModel()); }
         }
 
         private void ControlLoaded(object sender, RoutedEventArgs e)

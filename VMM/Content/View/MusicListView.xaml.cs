@@ -1,11 +1,10 @@
 ﻿using System.Windows;
-using System.Windows.Controls;
 using VMM.Content.ViewModel;
 using VMM.Model;
 
 namespace VMM.Content.View
 {
-    public partial class MusicListView : UserControl
+    public partial class MusicListView
     {
         private MusicListViewModel _model;
 
