@@ -20,6 +20,8 @@ namespace VMM
             Trace.WriteLine(String.Format("Unhandeled task exception: {0}", e.Exception));
 
             ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK);
+
+            Environment.Exit(0);
         }
 
         private void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
@@ -27,6 +29,8 @@ namespace VMM
             Trace.WriteLine(String.Format("Unhandeled exception: {0}", e.Exception));
 
             ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK);
+
+            Environment.Exit(0);
         }
     }
 }
