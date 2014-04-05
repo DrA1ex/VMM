@@ -205,7 +205,7 @@ namespace VMM.Content.ViewModel
 
             Task.Run(() =>
                      {
-                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c.Album != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
 
                          foreach (MusicEntry musicEntry in sorted)
                          {
