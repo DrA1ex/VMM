@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.CompilerServices;
-using System.Runtime.Remoting.Contexts;
 using VkNet;
 using VMM.Annotations;
 using VMM.Helper;
@@ -25,6 +24,7 @@ namespace VMM.Model
             Settings settings = SettingsVault.Read();
 
             Instance.AccessToken = settings.Token;
+            Instance.UserId = settings.UserId;
 
             if (!String.IsNullOrEmpty(Instance.AccessToken))
             {
@@ -37,7 +37,7 @@ namespace VMM.Model
         }
 
 
-        
+
         public WebClient Client
         {
             get { return _client ?? (_client = new WebClient()); }
@@ -90,9 +90,11 @@ namespace VMM.Model
                 Api.Authorize(AppId, login, password, VkNet.Enums.Settings.Audio);
 
                 AccessToken = (string)ReflectionHelper.GetPropertyValue(Api, "AccessToken");
+                UserId = Api.UserId ?? 0;
 
                 Settings settings = SettingsVault.Read();
                 settings.Token = AccessToken;
+                settings.UserId = UserId;
                 SettingsVault.Write(settings);
 
                 LoggedIn = true;
@@ -115,6 +117,7 @@ namespace VMM.Model
             try
             {
                 Api.Authorize(AccessToken);
+                Api.Users.IsAppUser(UserId); //Dummy call, throw exception if authorization failed
 
                 LoggedIn = true;
 

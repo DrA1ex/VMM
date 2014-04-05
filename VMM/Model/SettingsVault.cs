@@ -24,7 +24,7 @@ namespace VMM.Model
 
                             try
                             {
-                                return (Settings) reader.Deserialize(stream);
+                                return (Settings)reader.Deserialize(stream);
                             }
                             catch (Exception e)
                             {
@@ -75,5 +75,6 @@ namespace VMM.Model
     internal class Settings
     {
         public string Token { get; set; }
+        public long UserId { get; set; }
     }
 }
