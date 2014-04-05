@@ -1,6 +1,7 @@
 ﻿using System.Windows;
 using System.Windows.Controls;
 using VMM.Content.ViewModel;
+using VMM.Model;
 
 namespace VMM.Content.View
 {
@@ -22,7 +23,7 @@ namespace VMM.Content.View
 
         private void ViewLoaded(object sender, RoutedEventArgs e)
         {
-            if (Model.Music.Count == 0)
+            if (Model.Music.Count == 0 && Vk.Instance.LoggedIn)
             {
                 Model.Refresh();
             }
