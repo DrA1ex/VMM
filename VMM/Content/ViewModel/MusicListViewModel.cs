@@ -115,6 +115,7 @@ namespace VMM.Content.ViewModel
                                   {
                                       try
                                       {
+                                          var albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
                                           ReadOnlyCollection<Audio> musicList = Vk.Instance.Api.Audio.Get(Vk.Instance.UserId);
 
                                           foreach (Audio musicEntry in musicList)
@@ -129,8 +130,10 @@ namespace VMM.Content.ViewModel
                                                               Genre = song.Genre ?? AudioGenre.Other,
                                                               Duration = song.Duration,
                                                               Url = song.Url,
-                                                              AlbumId = song.AlbumId
                                                           };
+
+                                              if (song.AlbumId.HasValue)
+                                                  entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
 
                                               disp.BeginInvoke(new Action(() => Music.Add(entry)));
                                           }
@@ -202,7 +205,7 @@ namespace VMM.Content.ViewModel
 
             Task.Run(() =>
                      {
-                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c.AlbumId ?? 0).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
 
                          foreach (MusicEntry musicEntry in sorted)
                          {
@@ -225,6 +228,7 @@ namespace VMM.Content.ViewModel
                      {
                          try
                          {
+                             //TODO: Optimize reorder requests
                              for (int i = 0; i < Music.Count; i++)
                              {
                                  MusicEntry entry = Music[i];

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.ComponentModel;
 using VkNet.Enums;
+using VkNet.Model;
 using VMM.Annotations;
 
 namespace VMM.Model
@@ -17,7 +18,7 @@ namespace VMM.Model
 
         public AudioGenre Genre { get; set; }
 
-        public long? AlbumId { get; set; }
+        public AudioAlbum Album { get; set; }
 
         public int Duration { get; set; }
 
