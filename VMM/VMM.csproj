@@ -127,7 +127,7 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Compile Include="Model\MusicEntry.cs" />
-    <Compile Include="Model\MusicListChange.cs" />
+    <Compile Include="Model\MusicListTracking.cs" />
     <Compile Include="Model\SettingsVault.cs" />
     <Compile Include="Model\Vk.cs" />
     <Compile Include="Pages\Authorization.xaml.cs">
