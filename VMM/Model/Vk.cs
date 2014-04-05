@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Net;
 using System.Runtime.CompilerServices;
+using System.Runtime.Remoting.Contexts;
 using VkNet;
 using VMM.Annotations;
 using VMM.Helper;
@@ -36,6 +37,7 @@ namespace VMM.Model
         }
 
 
+        
         public WebClient Client
         {
             get { return _client ?? (_client = new WebClient()); }
@@ -87,7 +89,7 @@ namespace VMM.Model
             {
                 Api.Authorize(AppId, login, password, VkNet.Enums.Settings.Audio);
 
-                AccessToken = (string) ReflectionHelper.GetPropertyValue(Api, "AccessToken");
+                AccessToken = (string)ReflectionHelper.GetPropertyValue(Api, "AccessToken");
 
                 Settings settings = SettingsVault.Read();
                 settings.Token = AccessToken;
@@ -95,11 +97,11 @@ namespace VMM.Model
 
                 LoggedIn = true;
 
-                return new AuthorizationResults {Success = true};
+                return new AuthorizationResults { Success = true };
             }
             catch (Exception e)
             {
-                return new AuthorizationResults {Success = false, Message = e.Message};
+                return new AuthorizationResults { Success = false, Message = e.Message };
             }
         }
 
@@ -107,7 +109,7 @@ namespace VMM.Model
         {
             if (String.IsNullOrEmpty(AccessToken))
             {
-                return new AuthorizationResults {Success = false, Message = "Access Token is missing"};
+                return new AuthorizationResults { Success = false, Message = "Access Token is missing" };
             }
 
             try
@@ -116,11 +118,11 @@ namespace VMM.Model
 
                 LoggedIn = true;
 
-                return new AuthorizationResults {Success = true};
+                return new AuthorizationResults { Success = true };
             }
             catch (Exception e)
             {
-                return new AuthorizationResults {Success = false, Message = e.Message};
+                return new AuthorizationResults { Success = false, Message = e.Message };
             }
         }
 

@@ -55,7 +55,11 @@ namespace VMM.Content.ViewModel
                          {
                              try
                              {
-                                 Vk.Instance.Client.DownloadFile(song.Url, dlg.FileName);
+                                 var client = Vk.Instance.Client;
+                                 lock (client)
+                                 {
+                                     client.DownloadFile(song.Url, dlg.FileName);
+                                 }
                              }
                              catch (Exception e)
                              {
