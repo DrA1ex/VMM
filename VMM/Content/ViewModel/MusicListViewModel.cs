@@ -208,7 +208,7 @@ namespace VMM.Content.ViewModel
 
             Task.Run(() =>
                      {
-                         MusicEntry[] itemsToSort = selectedEntries.Any() ? selectedEntries : musicEntries.ToArray();
+                         MusicEntry[] itemsToSort = selectedEntries.Length > 1 ? selectedEntries : musicEntries.ToArray();
                          var startPosition = musicEntries.IndexOf(itemsToSort.First());
                          musicEntries.RemoveAll(itemsToSort.Contains);
 
