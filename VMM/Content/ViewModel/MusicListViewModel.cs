@@ -3,8 +3,10 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
+using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using VkNet.Enums;
@@ -92,7 +94,7 @@ namespace VMM.Content.ViewModel
 
         public ICommand SortCommand
         {
-            get { return _sortCommand ?? (_sortCommand = new DelegateCommand(Sort)); }
+            get { return _sortCommand ?? (_sortCommand = new DelegateCommand<MusicEntry[]>(Sort)); }
         }
 
         public ICommand SaveChangesCommand
@@ -195,9 +197,10 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        private void Sort()
+        private void Sort(MusicEntry[] selectedItems)
         {
-            List<MusicEntry> copyMusic = Music.ToList();
+            var musicEntries = Music.ToList();
+            var selectedEntries = (MusicEntry[])selectedItems.Clone();
             Music.Clear();
 
             IsBusy = true;
@@ -205,9 +208,15 @@ namespace VMM.Content.ViewModel
 
             Task.Run(() =>
                      {
-                         IEnumerable<MusicEntry> sorted = copyMusic.OrderBy(c => c.Album != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+                         MusicEntry[] itemsToSort = selectedEntries.Any() ? selectedEntries : musicEntries.ToArray();
+                         var startPosition = musicEntries.IndexOf(itemsToSort.First());
+                         musicEntries.RemoveAll(itemsToSort.Contains);
 
-                         foreach (MusicEntry musicEntry in sorted)
+                         IEnumerable<MusicEntry> sorted = itemsToSort.OrderBy(c => c.Album != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+
+                         musicEntries.InsertRange(startPosition, sorted);
+
+                         foreach (MusicEntry musicEntry in musicEntries)
                          {
                              MusicEntry entry = musicEntry;
                              disp.BeginInvoke(new Action(() => Music.Add(entry)));

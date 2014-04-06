@@ -32,11 +32,12 @@
                         </Style>
                     </DockPanel.Resources>
                     <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}"/>
-                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"/>
+                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}" 
+                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"/>
                     <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}" Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}"/>
 
-                    <mui:ModernButton IconData="{StaticResource UpIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveUpCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }"/>
-                    <mui:ModernButton IconData="{StaticResource DownIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveDownCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }"/>
+                    <mui:ModernButton IconData="{StaticResource UpIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveUpCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }" Focusable="False"/>
+                    <mui:ModernButton IconData="{StaticResource DownIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.MoveDownCommand}" IsEnabled="{Binding ElementName=MusicList, Path=DataContext.SelectedSong, Converter={StaticResource NullToBool} }" Focusable="False"/>
                 </DockPanel>
             </Grid>
 
