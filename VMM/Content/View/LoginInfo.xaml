@@ -5,11 +5,13 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:model="clr-namespace:VMM.Model"
              xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance {x:Type viewModel:LoginInfoViewModel}}"
              d:DesignHeight="300" d:DesignWidth="300">
     <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -26,21 +28,29 @@
         <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Text="Сведения об аутентификации" Style="{StaticResource Heading2}"
                    Margin="3,3,3,23" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Токен доступа:" Margin="3,3,13,3" />
-        <TextBlock Grid.Row="1" Grid.Column="1"
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Пользователь:" Margin="3,3,13,3"/>
+        <mui:BBCodeBlock Grid.Row="1" Grid.Column="1"
+                         Margin="3">
+            <mui:BBCodeBlock.BBCode>
+                <Binding Source="{x:Static model:Vk.Instance}" Path="UserId" StringFormat="[url=https://vk.com/id{0}]{0}[/url]" />
+            </mui:BBCodeBlock.BBCode>
+        </mui:BBCodeBlock>
+
+        <TextBlock Grid.Row="2" Grid.Column="0" Text="Токен доступа:" Margin="3,3,13,3" />
+        <TextBlock Grid.Row="2" Grid.Column="1"
                    Text="{Binding Source={x:Static model:Vk.Instance}, Path=AccessToken, Converter={StaticResource StringNullOrEmptyToText}}"
                    TextTrimming="CharacterEllipsis" Margin="3"
                    ToolTip="{Binding RelativeSource={RelativeSource Self}, Path=Text}" />
 
-        <TextBlock Grid.Row="2" Grid.Column="0" Text="Аутентификация:" Margin="3,3,13,3" />
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="Вход произведен" Margin="3"
+        <TextBlock Grid.Row="3" Grid.Column="0" Text="Аутентификация:" Margin="3,3,13,3" />
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Вход произведен" Margin="3"
                    Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}"
                    TextTrimming="CharacterEllipsis" />
-        <TextBlock Grid.Row="2" Grid.Column="1" Text="Ошибка входа. Возможно токен истек" Margin="3"
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Ошибка входа. Возможно токен истек" Margin="3"
                    Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}"
                    TextTrimming="CharacterEllipsis" />
 
-        <DockPanel Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
+        <DockPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="2" HorizontalAlignment="Right">
             <Button Content="Повторить" HorizontalAlignment="Right" Margin="5"
                     Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}"
                     Command="{Binding RetryCommand}" />
