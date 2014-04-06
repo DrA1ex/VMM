@@ -35,12 +35,12 @@
                           CommandParameter="{Binding .}"
                           IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}" />
 
-        <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource Accent}"
+        <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource ButtonText}"
                    Grid.Row="0"
                    Grid.Column="1" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="—" Margin="3" Foreground="{DynamicResource Accent}" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
         <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
-                   Foreground="{DynamicResource Accent}" />
+                   Foreground="{DynamicResource ButtonText}" />
         <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
             <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
             <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
