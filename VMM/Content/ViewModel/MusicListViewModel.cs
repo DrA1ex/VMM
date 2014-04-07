@@ -3,10 +3,8 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
-using System.Security.AccessControl;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Threading;
 using VkNet.Enums;
@@ -22,8 +20,6 @@ namespace VMM.Content.ViewModel
         private List<MusicListChange> _changesList;
         private bool _isBusy;
         private bool _isModified;
-        private ICommand _moveDownCommand;
-        private ICommand _moveUpCommand;
         private ObservableCollection<MusicEntry> _music;
         private ICommand _refreshCommand;
         private ICommand _removeCommand;
@@ -77,16 +73,6 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        public ICommand MoveUpCommand
-        {
-            get { return _moveUpCommand ?? (_moveUpCommand = new DelegateCommand(MoveUp)); }
-        }
-
-        public ICommand MoveDownCommand
-        {
-            get { return _moveDownCommand ?? (_moveDownCommand = new DelegateCommand(MoveDown)); }
-        }
-
         public ICommand RemoveCommand
         {
             get { return _removeCommand ?? (_removeCommand = new DelegateCommand<MusicEntry>(Remove)); }
@@ -117,7 +103,7 @@ namespace VMM.Content.ViewModel
                                   {
                                       try
                                       {
-                                          var albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
+                                          ReadOnlyCollection<AudioAlbum> albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
                                           ReadOnlyCollection<Audio> musicList = Vk.Instance.Api.Audio.Get(Vk.Instance.UserId);
 
                                           foreach (Audio musicEntry in musicList)
@@ -135,7 +121,9 @@ namespace VMM.Content.ViewModel
                                                           };
 
                                               if (song.AlbumId.HasValue)
+                                              {
                                                   entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
+                                              }
 
                                               disp.BeginInvoke(new Action(() => Music.Add(entry)));
                                           }
@@ -148,59 +136,31 @@ namespace VMM.Content.ViewModel
         }
 
 
-        private void MoveUp()
-        {
-            if (SelectedSong != null)
-            {
-                int index = Music.IndexOf(SelectedSong);
-                int newPosition = index - 1;
-
-                if (index != 0)
-                {
-                    Music.Move(index, newPosition);
-                    IsModified = true;
-                }
-            }
-        }
-
-        private void MoveDown()
-        {
-            if (SelectedSong != null)
-            {
-                int index = Music.IndexOf(SelectedSong);
-                int newPosition = index + 1;
-
-                if (index < Music.Count - 1)
-                {
-                    Music.Move(index, newPosition);
-                    IsModified = true;
-                }
-            }
-        }
-
         private void Remove(MusicEntry song)
         {
             if (IsBusy)
+            {
                 return;
+            }
 
 
             song.IsDeleted = !song.IsDeleted;
 
             if (song.IsDeleted)
             {
-                ChangesList.Add(new MusicListChange { ChangeType = ChangeType.Deleted, Data = new DeleteSong { SongId = song.Id } });
+                ChangesList.Add(new MusicListChange {ChangeType = ChangeType.Deleted, Data = new DeleteSong {SongId = song.Id}});
                 IsModified = true;
             }
             else
             {
-                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong)c.Data).SongId == song.Id);
+                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong) c.Data).SongId == song.Id);
             }
         }
 
         private void Sort(MusicEntry[] selectedItems)
         {
-            var musicEntries = Music.ToList();
-            var selectedEntries = (MusicEntry[])selectedItems.Clone();
+            List<MusicEntry> musicEntries = Music.ToList();
+            var selectedEntries = (MusicEntry[]) selectedItems.Clone();
             Music.Clear();
 
             IsBusy = true;
@@ -209,7 +169,7 @@ namespace VMM.Content.ViewModel
             Task.Run(() =>
                      {
                          MusicEntry[] itemsToSort = selectedEntries.Length > 1 ? selectedEntries : musicEntries.ToArray();
-                         var startPosition = musicEntries.IndexOf(itemsToSort.First());
+                         int startPosition = musicEntries.IndexOf(itemsToSort.First());
                          musicEntries.RemoveAll(itemsToSort.Contains);
 
                          IEnumerable<MusicEntry> sorted = itemsToSort.OrderBy(c => c.Album != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
@@ -250,7 +210,7 @@ namespace VMM.Content.ViewModel
 
                              foreach (MusicListChange change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
                              {
-                                 Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
+                                 Vk.Instance.Api.Audio.Delete(((DeleteSong) change.Data).SongId, Vk.Instance.UserId);
                              }
                          }
                          finally
@@ -268,6 +228,15 @@ namespace VMM.Content.ViewModel
             if (handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
+            }
+        }
+
+        public void MoveSong(int srcIndex, int targetIndex)
+        {
+            if (srcIndex != targetIndex)
+            {
+                Music.Move(srcIndex, targetIndex);
+                IsModified = true;
             }
         }
     }
