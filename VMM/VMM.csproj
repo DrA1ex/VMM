@@ -81,6 +81,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="Dialog\SortSettings.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -104,13 +108,19 @@
     </Compile>
     <Compile Include="Converters\BooleanInverter.cs" />
     <Compile Include="Converters\BoolToVisibleConverter.cs" />
+    <Compile Include="Converters\DescendingToIconDataConverter.cs" />
     <Compile Include="Converters\DurationConverter.cs" />
     <Compile Include="Converters\IsRemovedToBrush.cs" />
     <Compile Include="Converters\NullToBooleanConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToVisibleConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToTextConverter.cs" />
+    <Compile Include="Dialog\SortSettings.xaml.cs">
+      <DependentUpon>SortSettings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Dialog\ViewModel\SortSettingsViewModel.cs" />
     <Compile Include="Helper\DelegateCommand.cs" />
     <Compile Include="Helper\ReflectionHelper.cs" />
+    <Compile Include="Helper\SortHelper.cs" />
     <Compile Include="Helper\UiTreeHelper.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
@@ -127,6 +137,7 @@
     <Compile Include="Model\MusicEntry.cs" />
     <Compile Include="Model\MusicListTracking.cs" />
     <Compile Include="Model\SettingsVault.cs" />
+    <Compile Include="Model\SortingPath.cs" />
     <Compile Include="Model\Vk.cs" />
     <Compile Include="Pages\Authorization.xaml.cs">
       <DependentUpon>Authorization.xaml</DependentUpon>
@@ -147,6 +158,7 @@
       <Name>VkNet</Name>
     </ProjectReference>
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

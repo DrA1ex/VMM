@@ -5,11 +5,13 @@ using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows;
 using System.Windows.Input;
 using System.Windows.Threading;
 using VkNet.Enums;
 using VkNet.Model;
 using VMM.Annotations;
+using VMM.Dialog;
 using VMM.Helper;
 using VMM.Model;
 
@@ -148,19 +150,29 @@ namespace VMM.Content.ViewModel
 
             if (song.IsDeleted)
             {
-                ChangesList.Add(new MusicListChange {ChangeType = ChangeType.Deleted, Data = new DeleteSong {SongId = song.Id}});
+                ChangesList.Add(new MusicListChange { ChangeType = ChangeType.Deleted, Data = new DeleteSong { SongId = song.Id } });
                 IsModified = true;
             }
             else
             {
-                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong) c.Data).SongId == song.Id);
+                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong)c.Data).SongId == song.Id);
             }
         }
 
         private void Sort(MusicEntry[] selectedItems)
         {
+            var dlg = new SortSettings();
+            dlg.Owner = Application.Current.MainWindow;
+            var result = dlg.ShowDialog();
+
+            if (result != true)
+                return;
+
+            var sortingPaths = dlg.SortingPaths;
+
+
             List<MusicEntry> musicEntries = Music.ToList();
-            var selectedEntries = (MusicEntry[]) selectedItems.Clone();
+            var selectedEntries = (MusicEntry[])selectedItems.Clone();
             Music.Clear();
 
             IsBusy = true;
@@ -172,7 +184,7 @@ namespace VMM.Content.ViewModel
                          int startPosition = musicEntries.IndexOf(itemsToSort.First());
                          musicEntries.RemoveAll(itemsToSort.Contains);
 
-                         IEnumerable<MusicEntry> sorted = itemsToSort.OrderBy(c => c.Album != null ? c.Album.Title : null).ThenBy(c => c.Artist).ThenBy(c => c.Name).AsEnumerable();
+                         var sorted = SortHelper.Sort(itemsToSort, sortingPaths);
 
                          musicEntries.InsertRange(startPosition, sorted);
 
@@ -210,7 +222,7 @@ namespace VMM.Content.ViewModel
 
                              foreach (MusicListChange change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
                              {
-                                 Vk.Instance.Api.Audio.Delete(((DeleteSong) change.Data).SongId, Vk.Instance.UserId);
+                                 Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
                              }
                          }
                          finally
