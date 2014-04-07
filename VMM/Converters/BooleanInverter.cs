@@ -8,12 +8,10 @@ namespace VMM.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is bool)
-            {
-                return !(bool) value;
-            }
+            bool flag = (value is bool || value is int || value is long)
+                        && System.Convert.ToBoolean(value);
 
-            return null;
+            return !flag;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

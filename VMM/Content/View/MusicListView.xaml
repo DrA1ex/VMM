@@ -13,8 +13,6 @@
             <RowDefinition Height="3" />
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" IsIndeterminate="True"
-                     VerticalAlignment="Top" />
 
         <ListView x:Name="MusciView" Grid.Row="1" ItemsSource="{Binding Music}" SelectionMode="Extended" SelectedItem="{Binding SelectedSong}"
                   ScrollViewer.HorizontalScrollBarVisibility="Disabled">

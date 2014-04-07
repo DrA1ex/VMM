@@ -55,7 +55,7 @@
                     Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}"
                     Command="{Binding RetryCommand}" />
             <Button Content="Сменить аккаунт" HorizontalAlignment="Right" Margin="5"
-                    Command="{Binding ChangeAccountCommand}" />
+                    Command="{Binding ChangeAccountCommand}"/>
         </DockPanel>
 
     </Grid>

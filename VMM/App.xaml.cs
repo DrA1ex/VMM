@@ -4,6 +4,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
 using FirstFloor.ModernUI.Windows.Controls;
+using VkNet.Exception;
 
 namespace VMM
 {
@@ -18,6 +19,12 @@ namespace VMM
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
             Trace.WriteLine(String.Format("Unhandeled task exception: {0}", e.Exception));
+
+            if (e.Exception.InnerException is AccessTokenInvalidException)
+            {
+                e.SetObserved();
+                return;
+            }
 
             Dispatcher.Invoke(() =>
             {

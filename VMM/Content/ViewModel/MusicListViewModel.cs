@@ -19,10 +19,13 @@ namespace VMM.Content.ViewModel
 {
     public class MusicListViewModel : INotifyPropertyChanged
     {
+        private string _busyText;
         private List<MusicListChange> _changesList;
         private bool _isBusy;
         private bool _isModified;
         private ObservableCollection<MusicEntry> _music;
+        private int _progressCurrentValue;
+        private int _progressMaxValue;
         private ICommand _refreshCommand;
         private ICommand _removeCommand;
         private ICommand _saveChangesCommand;
@@ -49,6 +52,37 @@ namespace VMM.Content.ViewModel
             }
         }
 
+        public string BusyText
+        {
+            get { return _busyText; }
+            set
+            {
+                _busyText = value;
+                OnPropertyChanged("BusyText");
+            }
+        }
+
+        public int ProgressMaxValue
+        {
+            get { return _progressMaxValue; }
+            set
+            {
+                _progressMaxValue = value;
+                OnPropertyChanged("ProgressMaxValue");
+            }
+        }
+
+        public int ProgressCurrentValue
+        {
+            get { return _progressCurrentValue; }
+            set
+            {
+                _progressCurrentValue = value;
+                OnPropertyChanged("ProgressCurrentValue");
+            }
+        }
+
+        
 
         public bool IsModified
         {
@@ -100,6 +134,10 @@ namespace VMM.Content.ViewModel
             IsModified = false;
 
             Dispatcher disp = Dispatcher.CurrentDispatcher;
+
+            BusyText = "Подождите, обновляется список музыки...";
+            ProgressMaxValue = 0;
+            ProgressCurrentValue = 0;
 
             Task.Factory.StartNew(() =>
                                   {
@@ -163,12 +201,14 @@ namespace VMM.Content.ViewModel
         {
             var dlg = new SortSettings();
             dlg.Owner = Application.Current.MainWindow;
-            var result = dlg.ShowDialog();
+            bool? result = dlg.ShowDialog();
 
             if (result != true)
+            {
                 return;
+            }
 
-            var sortingPaths = dlg.SortingPaths;
+            SortingPath[] sortingPaths = dlg.SortingPaths;
 
 
             List<MusicEntry> musicEntries = Music.ToList();
@@ -178,13 +218,17 @@ namespace VMM.Content.ViewModel
             IsBusy = true;
             Dispatcher disp = Dispatcher.CurrentDispatcher;
 
+            BusyText = "Подождите, выполняется сортировка...";
+            ProgressMaxValue = 0;
+            ProgressCurrentValue = 0;
+
             Task.Run(() =>
                      {
                          MusicEntry[] itemsToSort = selectedEntries.Length > 1 ? selectedEntries : musicEntries.ToArray();
                          int startPosition = musicEntries.IndexOf(itemsToSort.First());
                          musicEntries.RemoveAll(itemsToSort.Contains);
 
-                         var sorted = SortHelper.Sort(itemsToSort, sortingPaths);
+                         IEnumerable<MusicEntry> sorted = SortHelper.Sort(itemsToSort, sortingPaths);
 
                          musicEntries.InsertRange(startPosition, sorted);
 
@@ -205,6 +249,10 @@ namespace VMM.Content.ViewModel
             IsBusy = true;
             Dispatcher disp = Dispatcher.CurrentDispatcher;
 
+            BusyText = "Подождите, применяются изменения...";
+            ProgressMaxValue = Music.Count + ChangesList.Count - 1;
+            ProgressCurrentValue = 0;
+
             Task.Run(() =>
                      {
                          try
@@ -217,12 +265,19 @@ namespace VMM.Content.ViewModel
                                  long nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
 
                                  Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, previosId, nextId);
+
+                                 disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+
                                  Thread.Sleep(340); //Allowed only 3 request per second
                              }
 
                              foreach (MusicListChange change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
                              {
                                  Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
+
+                                 disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+
+                                 Thread.Sleep(340);
                              }
                          }
                          finally
