@@ -60,7 +60,7 @@
 
         <!-- Addition sorting pathes -->
 
-        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" ItemsSource="{Binding SelectedPaths}" Grid.IsSharedSizeScope="True">
+        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" ItemsSource="{Binding SelectedPaths}" Grid.IsSharedSizeScope="True" Margin="0,3">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,3,0,3">
