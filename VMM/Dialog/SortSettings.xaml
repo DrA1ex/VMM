@@ -55,6 +55,7 @@
 
         <mui:ModernButton Grid.Row="1" Grid.Column="2" EllipseStrokeThickness="0" Margin="3"
                           IconData="{Binding PrimarySortingPath.Descending ,Converter={StaticResource DescendingToIconData}}"
+                          ToolTip="{Binding PrimarySortingPath.Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
                           Command="{Binding InvertSortDirectionCommand}"
                           CommandParameter="{Binding PrimarySortingPath}" />
 
@@ -78,6 +79,7 @@
 
                         <mui:ModernButton Grid.Column="2" EllipseStrokeThickness="0" Margin="3"
                           IconData="{Binding Descending ,Converter={StaticResource DescendingToIconData}}"
+                          ToolTip="{Binding Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
                           Command="{Binding DataContext.InvertSortDirectionCommand, RelativeSource={RelativeSource AncestorType={x:Type dialog:SortSettings}}}"
                           CommandParameter="{Binding}" />
 
@@ -107,6 +109,7 @@
 
             <mui:ModernButton Grid.Column="2" EllipseStrokeThickness="0" Margin="3"
                           IconData="{Binding SelectedSortingPath.Descending ,Converter={StaticResource DescendingToIconData}}"
+                          ToolTip="{Binding SelectedSortingPath.Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
                           Command="{Binding InvertSortDirectionCommand}"
                           CommandParameter="{Binding SelectedSortingPath}" />
             <Button Grid.Column="3" Content="+" Command="{Binding AddNewSortingPathCommand}" CommandParameter="{Binding SelectedSortingPath}"/>

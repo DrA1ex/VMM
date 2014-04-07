@@ -19,6 +19,7 @@
             <converters:NullToBooleanConverter x:Key="NullToBool" />
             <converters:IsRemovedToBrush x:Key="IsRemovedToBrush" />
             <converters:DescendingToIconDataConverter x:Key="DescendingToIconData" />
+            <converters:SortingMethodDescriptionConverter x:Key="SortingMethodDescriptionConverter" />
 
             <PathGeometry x:Key="DownloadIcon">F1 M 20,20L 50.25,20L 56,25.75L 56,56L 20,56L 20,20 Z M 52,27.25L 48.75,24L 48,24L 48,37L 28,37L 28,24L 24,24L 24,52L 52,52L 52,27.25 Z M 39,24L 39,34L 44,34L 44,24L 39,24 Z</PathGeometry>
             <PathGeometry x:Key="WaitIcon">F1 M 25,52L 51,52L 51,57L 25,57L 25,52 Z M 35,16L 41,16L 41,36.5L 49,27L 49,36.5L 38,49L 27,36.5L 27,27L 35,36.5L 35,16 Z</PathGeometry>

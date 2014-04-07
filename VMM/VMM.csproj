@@ -112,6 +112,7 @@
     <Compile Include="Converters\DurationConverter.cs" />
     <Compile Include="Converters\IsRemovedToBrush.cs" />
     <Compile Include="Converters\NullToBooleanConverter.cs" />
+    <Compile Include="Converters\SortingMethodDescriptionConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToVisibleConverter.cs" />
     <Compile Include="Converters\StringNullOrEmptyToTextConverter.cs" />
     <Compile Include="Dialog\SortSettings.xaml.cs">
