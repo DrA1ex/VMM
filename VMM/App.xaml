@@ -11,6 +11,8 @@
                 <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/modernui.dark.xaml" />
             </ResourceDictionary.MergedDictionaries>
 
+            <Color x:Key="AccentColor">#007acc</Color>
+
             <converters:StringNullOrEmptyToTextConverter x:Key="StringNullOrEmptyToText" />
             <converters:StringNullOrEmptyToVisibleConverter x:Key="StringNullOrEmptyToVisible" />
             <converters:BoolToVisibleConverter x:Key="BoolToVisible" />

@@ -71,7 +71,8 @@ namespace VMM.Content.View
         {
             var draggedItem = sender as ListViewItem;
 
-            if (draggedItem != null && eventArgs.LeftButton == MouseButtonState.Pressed)
+            if (draggedItem != null && eventArgs.LeftButton == MouseButtonState.Pressed
+                && !(eventArgs.OriginalSource is Button))
             {
                 DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
                 draggedItem.IsSelected = true;
