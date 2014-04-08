@@ -61,6 +61,8 @@ namespace VMM.Content.View
             {
                 IEnumerable<MusicEntry> o = MusciView.SelectedItems.Cast<MusicEntry>();
                 MusicEntry[] x = o.ToArray();
+                Model.SelectedItems = x;
+
                 return x;
             }
         }

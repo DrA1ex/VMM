@@ -21,7 +21,8 @@
             <Border Grid.Row="1" Background="#4C000000" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolToVisible}}">
                 <Border Background="{StaticResource WindowBackground}" Height="150" VerticalAlignment="Center">
                     <DockPanel>
-                        <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}" Style="{StaticResource Heading2}" HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top"/>
+                        <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}" Style="{StaticResource Heading2}"
+                                   HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis"/>
                         <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0" 
                                      Value="{Binding ElementName=MusicList, Path=DataContext.ProgressCurrentValue}" 
                                      Maximum="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue}" 

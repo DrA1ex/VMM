@@ -2,18 +2,24 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 using System.Windows.Input;
 using System.Windows.Threading;
+using FirstFloor.ModernUI.Windows.Controls;
 using VkNet.Enums;
 using VkNet.Model;
 using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
 using VMM.Model;
+using Application = System.Windows.Application;
 
 namespace VMM.Content.ViewModel
 {
@@ -28,7 +34,9 @@ namespace VMM.Content.ViewModel
         private int _progressMaxValue;
         private ICommand _refreshCommand;
         private ICommand _removeCommand;
+        private ICommand _removeSelectedCommand;
         private ICommand _saveChangesCommand;
+        private ICommand _saveSelectedCommand;
         private MusicEntry _selectedSong;
         private ICommand _sortCommand;
 
@@ -82,7 +90,6 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        
 
         public bool IsModified
         {
@@ -93,6 +100,8 @@ namespace VMM.Content.ViewModel
                 OnPropertyChanged("IsModified");
             }
         }
+
+        public MusicEntry[] SelectedItems { get; set; }
 
         public List<MusicListChange> ChangesList
         {
@@ -124,7 +133,80 @@ namespace VMM.Content.ViewModel
             get { return _saveChangesCommand ?? (_saveChangesCommand = new DelegateCommand(SaveChanges)); }
         }
 
+        public ICommand RemoveSelectedCommand
+        {
+            get { return _removeSelectedCommand ?? (_removeSelectedCommand = new DelegateCommand<MusicEntry[]>(RemoveSelected)); }
+        }
+
+        public ICommand SaveSelectedCommand
+        {
+            get { return _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected)); }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void SaveSelected(MusicEntry[] musicEntries)
+        {
+            if (musicEntries == null || musicEntries.Length == 0)
+            {
+                return;
+            }
+
+            var dlg = new FolderBrowserDialog();
+            DialogResult result = dlg.ShowDialog();
+
+            if (result != DialogResult.OK)
+            {
+                return;
+            }
+
+            IsBusy = true;
+            Dispatcher disp = Dispatcher.CurrentDispatcher;
+
+            BusyText = "Подождите, выполняется сохранение выбранных песен...";
+            ProgressMaxValue = musicEntries.Length;
+            ProgressCurrentValue = 0;
+
+            string savePath = dlg.SelectedPath;
+
+            Task.Run(() =>
+                     {
+                         try
+                         {
+                             foreach (MusicEntry song in musicEntries)
+                             {
+                                 string fileName = String.Format("{0}.mp3",
+                                     new String(String.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray()));
+
+                                 WebClient client = Vk.Instance.Client;
+                                 lock (client)
+                                 {
+                                     client.DownloadFile(song.Url, Path.Combine(savePath, fileName));
+
+                                     disp.Invoke(() => { ++ProgressCurrentValue; });
+                                 }
+                             }
+                         }
+                         catch (Exception e)
+                         {
+                             Trace.WriteLine(String.Format("While saving file: {0}", e));
+
+                             disp.Invoke(() => { ModernDialog.ShowMessage("Во время сохранения произошла ошибка :(", "Не удалось сохранить файл", MessageBoxButton.OK); });
+                         }
+                         finally
+                         {
+                             disp.Invoke(() => { IsBusy = false; });
+                         }
+                     });
+        }
+
+        private void RemoveSelected(MusicEntry[] musicEntries)
+        {
+            foreach (var entry in musicEntries)
+            {
+                entry.IsDeleted = true;
+            }
+        }
 
         public void Refresh()
         {
@@ -199,8 +281,7 @@ namespace VMM.Content.ViewModel
 
         private void Sort(MusicEntry[] selectedItems)
         {
-            var dlg = new SortSettings();
-            dlg.Owner = Application.Current.MainWindow;
+            var dlg = new SortSettings { Owner = Application.Current.MainWindow };
             bool? result = dlg.ShowDialog();
 
             if (result != true)
