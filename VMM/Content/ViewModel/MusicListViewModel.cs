@@ -173,18 +173,23 @@ namespace VMM.Content.ViewModel
                      {
                          try
                          {
+                             WebClient client = Vk.Instance.Client;
+
                              foreach (MusicEntry song in musicEntries)
                              {
                                  string fileName = String.Format("{0}.mp3",
                                      new String(String.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray()));
 
-                                 WebClient client = Vk.Instance.Client;
-                                 lock (client)
+                                 var filePath = Path.Combine(savePath, fileName);
+                                 if (!File.Exists(filePath))
                                  {
-                                     client.DownloadFile(song.Url, Path.Combine(savePath, fileName));
-
-                                     disp.Invoke(() => { ++ProgressCurrentValue; });
+                                     lock (client)
+                                     {
+                                         client.DownloadFile(song.Url, filePath);
+                                     }
                                  }
+
+                                 disp.Invoke(() => { ++ProgressCurrentValue; });
                              }
                          }
                          catch (Exception e)
