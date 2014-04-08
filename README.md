@@ -6,7 +6,7 @@ Vk (Vkontakte) Music Manager
 
 Менеджер музыки Вконтакте.
 
-![alt tag](http://habrastorage.org/files/e84/da3/04b/e84da304b5ef4ee5a681d0c6559577c6.png)
+![alt tag](http://habrastorage.org/files/732/847/e4f/732847e4fa4d40dca0d7ec43c6f993be.png)
 
 
 Основные функции:
