@@ -26,6 +26,8 @@ namespace VMM.Utils
         private Mp3FileReader Reader { get; set; }
         public MusicEntry CurrentSong { get; private set; }
 
+        private bool IsStopManualy { get; set; }
+
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -46,6 +48,15 @@ namespace VMM.Utils
 
         protected virtual void OnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
         {
+            //PlaybackStopped raised not only when file was ended
+            //We need raise event only if playback stopped automatically
+            if (IsStopManualy)
+            {
+                IsStopManualy = false;
+                return;
+            }
+
+
             EventHandler<StoppedEventArgs> handler = PlaybackStopped;
             if (handler != null)
             {
@@ -69,20 +80,14 @@ namespace VMM.Utils
                 return;
             }
 
-            if (CurrentSong != null)
-            {
-                CurrentSong.IsPlaying = false;
-            }
-            CurrentSong = entry;
-
             if (Reader != null)
             {
+                Stop();
                 Reader.Dispose();
-                WaveOut.Stop();
             }
 
+            CurrentSong = entry;
             MemoryStream stream = CacheHelper.Download(entry);
-
             Reader = new Mp3FileReader(stream);
 
             WaveOut.Init(Reader);
@@ -92,7 +97,10 @@ namespace VMM.Utils
         public void Stop()
         {
             if (WaveOut.PlaybackState != PlaybackState.Stopped)
+            {
+                IsStopManualy = true;
                 WaveOut.Stop();
+            }
 
             if (CurrentSong != null)
                 CurrentSong.IsPlaying = false;

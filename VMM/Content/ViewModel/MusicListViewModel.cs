@@ -406,7 +406,7 @@ namespace VMM.Content.ViewModel
         {
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
             MusicEntry next = current != null
-                ? Music.SkipWhile(c => c != current).Skip(1).SingleOrDefault()
+                ? Music.SkipWhile(c => c != current).Skip(1).FirstOrDefault()
                 : Music.FirstOrDefault();
 
             if (next != null)
@@ -416,6 +416,25 @@ namespace VMM.Content.ViewModel
             else
             {
                 MusicPlayer.Instance.Stop();
+            }
+        }
+
+        private ICommand _playPreviousCommand;
+        public ICommand PlayPreviousCommand
+        {
+            get { return _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious)); }
+        }
+
+        private void PlayPrevious()
+        {
+            MusicEntry current = MusicPlayer.Instance.CurrentSong;
+            MusicEntry previous = current != null
+                ? Music.SkipWhile(c => c != current).Skip(-1).FirstOrDefault()
+                : Music.LastOrDefault();
+
+            if (previous != null)
+            {
+                PlaySong(previous);
             }
         }
 
