@@ -59,4 +59,23 @@ namespace VMM.Model
             }
         }
     }
+
+    internal class MusicEntryDesign
+    {
+        public long Id { get { return 123456; } }
+
+        public string Artist { get { return "Three Days Grace"; } }
+
+        public string Name { get { return "Never Too Late"; } }
+
+        public AudioGenre Genre { get { return AudioGenre.Rock; } }
+
+        public AudioAlbum Album { get { return new AudioAlbum { Title = "One-X" }; } }
+
+        public int Duration { get { return 3 * 60 + 31; } }
+
+        public Uri Url { get { return new Uri("http:\\examle.com"); } }
+
+        public bool IsDeleted { get { return false; } }
+    }
 }

@@ -8,19 +8,32 @@
              xmlns:model="clr-namespace:VMM.Model"
              xmlns:view="clr-namespace:VMM.Content.View"
              xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
-             mc:Ignorable="d" d:DataContext="{d:DesignInstance viewModel:MusicEntryViewModel}" x:Name="Self"
-             d:DesignHeight="300" d:DesignWidth="300">
+             xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
+             mc:Ignorable="d" 
+             d:DataContext="{d:DesignInstance viewModel:MusicEntryViewModel}" 
+             x:Name="Self"
+             d:DesignHeight="50" d:DesignWidth="435">
     <UserControl.Resources>
         <converters:DurationConverter x:Key="DurationConverterResource" />
+        <model:MusicEntryDesign x:Key="MusicEntryDesign"/>
+
+        <Style TargetType="UserControl">
+            <Style.Triggers>
+                <Trigger Property="componentModel:DesignerProperties.IsInDesignMode"
+                         Value="True">
+                    <Setter Property="Background" Value="{StaticResource WindowBackground}" />
+                </Trigger>
+            </Style.Triggers>
+        </Style>
     </UserControl.Resources>
-    <Grid x:Name="Grid" d:DataContext="{d:DesignInstance model:MusicEntry}"
+
+    <Grid x:Name="Grid" d:DataContext="{Binding Source={StaticResource MusicEntryDesign}}"
           Background="{Binding IsDeleted, Converter={StaticResource IsRemovedToBrush}}">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="*" />
+            <ColumnDefinition />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -28,27 +41,26 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="14" IconWidth="14"
+        <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource ButtonText}"
+                   Grid.Row="0" />
+        <TextBlock Grid.Row="0" Grid.Column="1" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
+                   Foreground="{DynamicResource ButtonText}" />
+        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+            <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
+            <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
+                       Foreground="{DynamicResource ModernButtonBorder}" />
+        </DockPanel>
+        <DockPanel Grid.Row="0" Grid.Column="3" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+            <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3" VerticalAlignment="Center"
+                       Foreground="{DynamicResource ModernButtonBorder}" />
+
+            <mui:ModernButton EllipseDiameter="24" IconHeight="14" IconWidth="14"
                           IconData="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolToIcon}}"
                           VerticalAlignment="Center" Margin="3"
                           Command="{Binding Path=DataContext.SaveSongCommand, ElementName=Self}"
                           CommandParameter="{Binding .}"
                           IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}" />
-
-        <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource ButtonText}"
-                   Grid.Row="0"
-                   Grid.Column="1" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
-        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
-                   Foreground="{DynamicResource ButtonText}" />
-        <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
-            <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
-            <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
-                       Foreground="{DynamicResource ModernButtonBorder}" />
-        </DockPanel>
-        <DockPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3"
-                       Foreground="{DynamicResource ModernButtonBorder}" />
 
             <mui:ModernButton Margin="3" EllipseDiameter="24" IconHeight="14" IconWidth="14"
                               IconData="{StaticResource RemoveIcon}"
