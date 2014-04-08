@@ -19,6 +19,7 @@ using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
 using VMM.Model;
+using VMM.Utils;
 using Application = System.Windows.Application;
 
 namespace VMM.Content.ViewModel
@@ -30,6 +31,8 @@ namespace VMM.Content.ViewModel
         private bool _isBusy;
         private bool _isModified;
         private ObservableCollection<MusicEntry> _music;
+        private ICommand _playNextCommand;
+        private ICommand _playSongCommand;
         private int _progressCurrentValue;
         private int _progressMaxValue;
         private ICommand _refreshCommand;
@@ -39,6 +42,12 @@ namespace VMM.Content.ViewModel
         private ICommand _saveSelectedCommand;
         private MusicEntry _selectedSong;
         private ICommand _sortCommand;
+
+        public MusicListViewModel()
+        {
+            MusicPlayer.Instance.PlaybackStopped += delegate { PlayNext(); };
+        }
+
 
         public ICommand RefreshCommand
         {
@@ -143,6 +152,16 @@ namespace VMM.Content.ViewModel
             get { return _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected)); }
         }
 
+        public ICommand PlaySongCommand
+        {
+            get { return _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlaySong)); }
+        }
+
+        public ICommand PlayNextCommand
+        {
+            get { return _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext)); }
+        }
+
         public event PropertyChangedEventHandler PropertyChanged;
 
         private void SaveSelected(MusicEntry[] musicEntries)
@@ -180,7 +199,7 @@ namespace VMM.Content.ViewModel
                                  string fileName = String.Format("{0}.mp3",
                                      new String(String.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray()));
 
-                                 var filePath = Path.Combine(savePath, fileName);
+                                 string filePath = Path.Combine(savePath, fileName);
                                  if (!File.Exists(filePath))
                                  {
                                      lock (client)
@@ -207,7 +226,7 @@ namespace VMM.Content.ViewModel
 
         private void RemoveSelected(MusicEntry[] musicEntries)
         {
-            foreach (var entry in musicEntries)
+            foreach (MusicEntry entry in musicEntries)
             {
                 entry.IsDeleted = true;
             }
@@ -372,6 +391,37 @@ namespace VMM.Content.ViewModel
                              disp.BeginInvoke(new Action(Refresh));
                          }
                      });
+        }
+
+        private void PlaySong(MusicEntry musicEntry)
+        {
+            Task.Run(() =>
+                     {
+                         lock (MusicPlayer.Instance)
+                             MusicPlayer.Instance.Play(musicEntry);
+                     });
+        }
+
+        private void PlayNext()
+        {
+            MusicEntry current = MusicPlayer.Instance.CurrentSong;
+            if (current != null)
+            {
+                MusicEntry next = Music.SkipWhile(c => c != current).Skip(1).SingleOrDefault();
+
+                if (next != null)
+                {
+                    PlaySong(next);
+                }
+            }
+            else
+            {
+                MusicEntry firstSong = Music.FirstOrDefault();
+                if (firstSong != null)
+                {
+                    PlaySong(firstSong);
+                }
+            }
         }
 
         [NotifyPropertyChangedInvocator]

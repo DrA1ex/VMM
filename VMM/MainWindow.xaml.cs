@@ -1,5 +1,6 @@
 ﻿using System;
 using VMM.Model;
+using VMM.Utils;
 
 namespace VMM
 {
@@ -10,6 +11,11 @@ namespace VMM
             InitializeComponent();
 
             ContentSource = Vk.Instance.LoggedIn ? new Uri("/Pages/MainPage.xaml", UriKind.Relative) : new Uri("/Pages/Authorization.xaml", UriKind.Relative);
+        }
+
+        private void OnClosed(object sender, EventArgs e)
+        {
+            MusicPlayer.Instance.Dispose();
         }
     }
 }

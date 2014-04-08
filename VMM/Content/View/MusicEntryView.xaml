@@ -30,6 +30,7 @@
     <Grid x:Name="Grid" d:DataContext="{Binding Source={StaticResource MusicEntryDesign}}"
           Background="{Binding IsDeleted, Converter={StaticResource IsRemovedToBrush}}">
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto"/>
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
@@ -41,17 +42,23 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
+        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="10" IconWidth="10" 
+                          VerticalAlignment="Center" Margin="3"
+                          IconData="{Binding IsPlaying, Converter={StaticResource BoolToPlayIcon}}"
+                          Command="{Binding Path=DataContext.PlaySongCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
+                          CommandParameter="{Binding}"/>
+
         <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource ButtonText}"
-                   Grid.Row="0" />
-        <TextBlock Grid.Row="0" Grid.Column="1" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
+                   Grid.Row="0" Grid.Column="1" />
+        <TextBlock Grid.Row="0" Grid.Column="2" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
+        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
                    Foreground="{DynamicResource ButtonText}" />
-        <DockPanel Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="4">
+        <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
             <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
             <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
                        Foreground="{DynamicResource ModernButtonBorder}" />
         </DockPanel>
-        <DockPanel Grid.Row="0" Grid.Column="3" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
+        <DockPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
             <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3" VerticalAlignment="Center"
                        Foreground="{DynamicResource ModernButtonBorder}" />
 

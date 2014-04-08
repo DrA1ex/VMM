@@ -9,6 +9,7 @@ namespace VMM.Model
     public class MusicEntry : INotifyPropertyChanged
     {
         private bool _isDeleted;
+        private bool _isPlaying;
         private bool _modified;
         public long Id { get; set; }
 
@@ -46,6 +47,16 @@ namespace VMM.Model
             }
         }
 
+        public bool IsPlaying
+        {
+            get { return _isPlaying; }
+            set
+            {
+                _isPlaying = value;
+                OnPropertyChanged("IsPlaying");
+            }
+        }
+
 
         public event PropertyChangedEventHandler PropertyChanged;
 
@@ -62,20 +73,49 @@ namespace VMM.Model
 
     internal class MusicEntryDesign
     {
-        public long Id { get { return 123456; } }
+        public long Id
+        {
+            get { return 123456; }
+        }
 
-        public string Artist { get { return "Three Days Grace"; } }
+        public string Artist
+        {
+            get { return "Three Days Grace"; }
+        }
 
-        public string Name { get { return "Never Too Late"; } }
+        public string Name
+        {
+            get { return "Never Too Late"; }
+        }
 
-        public AudioGenre Genre { get { return AudioGenre.Rock; } }
+        public AudioGenre Genre
+        {
+            get { return AudioGenre.Rock; }
+        }
 
-        public AudioAlbum Album { get { return new AudioAlbum { Title = "One-X" }; } }
+        public AudioAlbum Album
+        {
+            get { return new AudioAlbum { Title = "One-X" }; }
+        }
 
-        public int Duration { get { return 3 * 60 + 31; } }
+        public int Duration
+        {
+            get { return 3 * 60 + 31; }
+        }
 
-        public Uri Url { get { return new Uri("http:\\examle.com"); } }
+        public Uri Url
+        {
+            get { return new Uri("http:\\examle.com"); }
+        }
 
-        public bool IsDeleted { get { return false; } }
+        public bool IsDeleted
+        {
+            get { return false; }
+        }
+
+        public bool IsPlaying
+        {
+            get { return false; }
+        }
     }
 }
