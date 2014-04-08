@@ -32,6 +32,7 @@ namespace VMM.Content.ViewModel
         private bool _isModified;
         private ObservableCollection<MusicEntry> _music;
         private ICommand _playNextCommand;
+        private ICommand _playPreviousCommand;
         private ICommand _playSongCommand;
         private int _progressCurrentValue;
         private int _progressMaxValue;
@@ -160,6 +161,11 @@ namespace VMM.Content.ViewModel
         public ICommand PlayNextCommand
         {
             get { return _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext)); }
+        }
+
+        public ICommand PlayPreviousCommand
+        {
+            get { return _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious)); }
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -395,19 +401,35 @@ namespace VMM.Content.ViewModel
 
         private void PlaySong(MusicEntry musicEntry)
         {
-            Task.Run(() =>
-                     {
-                         lock (MusicPlayer.Instance)
-                             MusicPlayer.Instance.Play(musicEntry);
-                     });
+            if (musicEntry == null)
+            {
+                musicEntry = Music.FirstOrDefault();
+            }
+
+            if (musicEntry != null)
+            {
+                Task.Run(() =>
+                         {
+                             lock (MusicPlayer.Instance)
+                                 MusicPlayer.Instance.Play(musicEntry);
+                         });
+            }
         }
 
         private void PlayNext()
         {
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
-            MusicEntry next = current != null
-                ? Music.SkipWhile(c => c != current).Skip(1).FirstOrDefault()
-                : Music.FirstOrDefault();
+
+            int currentIndex = Music.IndexOf(current);
+            MusicEntry next = null;
+            if (currentIndex >= 0 && currentIndex < Music.Count - 1)
+            {
+                next = Music[currentIndex + 1];
+            }
+            else if (currentIndex == Music.Count - 1)
+            {
+                next = Music.FirstOrDefault();
+            }
 
             if (next != null)
             {
@@ -419,18 +441,20 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        private ICommand _playPreviousCommand;
-        public ICommand PlayPreviousCommand
-        {
-            get { return _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious)); }
-        }
-
         private void PlayPrevious()
         {
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
-            MusicEntry previous = current != null
-                ? Music.SkipWhile(c => c != current).Skip(-1).FirstOrDefault()
-                : Music.LastOrDefault();
+
+            int currentIndex = Music.IndexOf(current);
+            MusicEntry previous = null;
+            if (currentIndex > 0 && currentIndex < Music.Count)
+            {
+                previous = Music[currentIndex - 1];
+            }
+            else if (currentIndex == 0)
+            {
+                previous = Music.LastOrDefault();
+            }
 
             if (previous != null)
             {

@@ -7,6 +7,7 @@
              xmlns:view="clr-namespace:VMM.Content.View"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
+             xmlns:control="clr-namespace:VMM.Control"
              mc:Ignorable="d"
              d:DesignHeight="300" d:DesignWidth="300">
 
@@ -36,13 +37,15 @@
         <Grid Style="{StaticResource ContentRoot}">
             <Grid Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
                 <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
                     <RowDefinition/>
                     <RowDefinition Height="Auto"/>
                 </Grid.RowDefinitions>
 
-                <view:MusicListView x:Name="MusicList" d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}"/>
+                <control:PlayerControl DataContext="{Binding ElementName=MusicList, Path=DataContext}"/>
+                <view:MusicListView Grid.Row="1" x:Name="MusicList" d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}"/>
 
-                <DockPanel Grid.Row="1" HorizontalAlignment="Center">
+                <DockPanel Grid.Row="2" HorizontalAlignment="Center">
                     <DockPanel.Resources>
                         <Style TargetType="{x:Type mui:ModernButton}">
                             <Setter Property="Margin" Value="5"/>

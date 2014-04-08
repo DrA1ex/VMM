@@ -73,6 +73,12 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="Control\PlayerControl.xaml.cs">
+      <DependentUpon>PlayerControl.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\SeekBar.xaml.cs">
+      <DependentUpon>SeekBar.xaml</DependentUpon>
+    </Compile>
     <Compile Include="Converters\BoolToPlayIconConverter.cs" />
     <Compile Include="Helper\CacheHelper.cs" />
     <Compile Include="Utils\MusicPlayer.cs" />
@@ -89,6 +95,14 @@
       <Generator>MSBuild:Compile</Generator>
     </Page>
     <Page Include="Content\View\MusicListView.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\PlayerControl.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\SeekBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
