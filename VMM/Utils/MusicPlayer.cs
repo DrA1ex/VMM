@@ -89,6 +89,15 @@ namespace VMM.Utils
             Play();
         }
 
+        public void Stop()
+        {
+            if (WaveOut.PlaybackState != PlaybackState.Stopped)
+                WaveOut.Stop();
+
+            if (CurrentSong != null)
+                CurrentSong.IsPlaying = false;
+        }
+
         public void Pause()
         {
             if (WaveOut.PlaybackState == PlaybackState.Playing)

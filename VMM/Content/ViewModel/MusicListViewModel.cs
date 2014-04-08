@@ -405,22 +405,17 @@ namespace VMM.Content.ViewModel
         private void PlayNext()
         {
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
-            if (current != null)
-            {
-                MusicEntry next = Music.SkipWhile(c => c != current).Skip(1).SingleOrDefault();
+            MusicEntry next = current != null
+                ? Music.SkipWhile(c => c != current).Skip(1).SingleOrDefault()
+                : Music.FirstOrDefault();
 
-                if (next != null)
-                {
-                    PlaySong(next);
-                }
+            if (next != null)
+            {
+                PlaySong(next);
             }
             else
             {
-                MusicEntry firstSong = Music.FirstOrDefault();
-                if (firstSong != null)
-                {
-                    PlaySong(firstSong);
-                }
+                MusicPlayer.Instance.Stop();
             }
         }
 
