@@ -87,7 +87,8 @@ namespace VMM.Model
         {
             try
             {
-                Api.Authorize(AppId, login, password, VkNet.Enums.Settings.Audio);
+                //We set flag Offline, so token will newer expired
+                Api.Authorize(AppId, login, password, VkNet.Enums.Settings.Audio | VkNet.Enums.Settings.Offline);
 
                 AccessToken = (string)ReflectionHelper.GetPropertyValue(Api, "AccessToken");
                 UserId = Api.UserId ?? 0;

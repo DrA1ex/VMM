@@ -46,7 +46,7 @@
         <TextBlock Grid.Row="3" Grid.Column="1" Text="Вход произведен" Margin="3"
                    Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}"
                    TextTrimming="CharacterEllipsis" />
-        <TextBlock Grid.Row="3" Grid.Column="1" Text="Ошибка входа. Возможно токен истек" Margin="3"
+        <TextBlock Grid.Row="3" Grid.Column="1" Text="Ошибка входа. Проблемы с сетью?" Margin="3"
                    Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}"
                    TextTrimming="CharacterEllipsis" />
 
