@@ -9,6 +9,7 @@ namespace VMM.Model
     public class MusicEntry : INotifyPropertyChanged
     {
         private bool _isDeleted;
+        private bool _isLoading;
         private bool _isPlaying;
         private bool _modified;
         public long Id { get; set; }
@@ -54,6 +55,16 @@ namespace VMM.Model
             {
                 _isPlaying = value;
                 OnPropertyChanged("IsPlaying");
+            }
+        }
+
+        public bool IsLoading
+        {
+            get { return _isLoading; }
+            set
+            {
+                _isLoading = value;
+                OnPropertyChanged("IsLoading");
             }
         }
 
@@ -116,6 +127,11 @@ namespace VMM.Model
         public bool IsPlaying
         {
             get { return false; }
+        }
+
+        public bool IsLoading
+        {
+            get { return true; }
         }
     }
 }

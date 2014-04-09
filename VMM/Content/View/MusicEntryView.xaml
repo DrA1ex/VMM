@@ -63,11 +63,17 @@
                        Foreground="{DynamicResource ModernButtonBorder}" />
 
             <mui:ModernButton EllipseDiameter="24" IconHeight="14" IconWidth="14"
-                          IconData="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolToIcon}}"
-                          VerticalAlignment="Center" Margin="3"
+                              VerticalAlignment="Center" Margin="3"
                           Command="{Binding Path=DataContext.SaveSongCommand, ElementName=Self}"
                           CommandParameter="{Binding .}"
-                          IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}" />
+                          IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}">
+                <mui:ModernButton.IconData>
+                    <MultiBinding Converter="{StaticResource BoolToIcon}">
+                        <Binding ElementName="Self" Path="DataContext.SavingInProgress" />
+                        <Binding Path="IsLoading"/>
+                    </MultiBinding>
+                </mui:ModernButton.IconData>
+            </mui:ModernButton>
 
             <mui:ModernButton Margin="3" EllipseDiameter="24" IconHeight="14" IconWidth="14"
                               IconData="{StaticResource RemoveIcon}"

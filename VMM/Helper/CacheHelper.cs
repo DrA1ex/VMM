@@ -11,6 +11,17 @@ namespace VMM.Helper
 
         public static MemoryStream Download(MusicEntry entry)
         {
+            entry.IsLoading = true;
+
+            var stream = DownloadInternal(entry);
+
+            entry.IsLoading = false;
+
+            return stream;
+        }
+
+        private static MemoryStream DownloadInternal(MusicEntry entry)
+        {
             byte[] data;
 
             string cachePath = Path.Combine(Path.GetTempPath(), TempPath);
@@ -53,9 +64,25 @@ namespace VMM.Helper
         {
             lock (Vk.Instance.Client)
             {
-                Vk.Instance.Client.OpenRead(uri);
+                try
+                {
+                    var stream = Vk.Instance.Client.OpenRead(uri);
 
-                return long.Parse(Vk.Instance.Client.ResponseHeaders["Content-Length"]);
+                    var fileSize = long.Parse(Vk.Instance.Client.ResponseHeaders["Content-Length"]);
+
+                    if (stream != null)
+                    {
+                        stream.Close();
+                    }
+
+                    return fileSize;
+                }
+                catch (Exception e)
+                {
+                    Trace.WriteLine(String.Format("While getting file size: {0}", e));
+
+                    return 0;
+                }
             }
         }
     }
