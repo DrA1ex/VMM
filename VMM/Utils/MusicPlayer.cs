@@ -71,8 +71,6 @@ namespace VMM.Utils
             }
         }
 
-        private bool IsStopManualy { get; set; }
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
@@ -95,15 +93,6 @@ namespace VMM.Utils
 
         protected virtual void OnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
         {
-            //PlaybackStopped raised not only when file was ended
-            //We need raise event only if playback stopped automatically
-            if (IsStopManualy)
-            {
-                IsStopManualy = false;
-                return;
-            }
-
-
             EventHandler<StoppedEventArgs> handler = PlaybackStopped;
             if (handler != null)
             {
@@ -143,13 +132,7 @@ namespace VMM.Utils
 
         public void Stop()
         {
-            if (WaveOut.PlaybackState != PlaybackState.Stopped)
-            {
-                IsStopManualy = true;
-                WaveOut.Stop();
-
-                SeekTimer.Stop();
-            }
+            SeekTimer.Stop();
 
             if (CurrentSong != null)
             {
