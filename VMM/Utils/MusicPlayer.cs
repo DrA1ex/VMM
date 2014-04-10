@@ -129,8 +129,12 @@ namespace VMM.Utils
 
             if (Reader != null)
             {
-                Stop();
                 Reader.Dispose();
+            }
+
+            if (CurrentSong != null)
+            {
+                CurrentSong.IsPlaying = false;
             }
 
             CurrentSong = entry;
@@ -143,12 +147,18 @@ namespace VMM.Utils
 
         public void Stop()
         {
+
             if (WaveOut.PlaybackState != PlaybackState.Stopped)
             {
                 IsStopManualy = true;
                 WaveOut.Stop();
 
                 SeekTimer.Stop();
+            }
+
+            if (Reader != null)
+            {
+                Reader.Dispose();
             }
 
             if (CurrentSong != null)
