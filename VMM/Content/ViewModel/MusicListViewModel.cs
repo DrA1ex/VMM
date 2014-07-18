@@ -406,6 +406,9 @@ namespace VMM.Content.ViewModel
                 musicEntry = Music.FirstOrDefault();
             }
 
+            if (MusicPlayer.Instance.CurrentSong != null && MusicPlayer.Instance.CurrentSong != musicEntry)
+                MusicPlayer.Instance.Stop();
+
             if (musicEntry != null)
             {
                 Task.Run(() =>
@@ -418,6 +421,9 @@ namespace VMM.Content.ViewModel
 
         private void PlayNext()
         {
+            if (MusicPlayer.Instance.CurrentSong != null)
+                MusicPlayer.Instance.Stop();
+
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
 
             int currentIndex = Music.IndexOf(current);
@@ -435,14 +441,13 @@ namespace VMM.Content.ViewModel
             {
                 PlaySong(next);
             }
-            else
-            {
-                MusicPlayer.Instance.Stop();
-            }
         }
 
         private void PlayPrevious()
         {
+            if (MusicPlayer.Instance.CurrentSong != null)
+                MusicPlayer.Instance.Stop();
+
             MusicEntry current = MusicPlayer.Instance.CurrentSong;
 
             int currentIndex = Music.IndexOf(current);
