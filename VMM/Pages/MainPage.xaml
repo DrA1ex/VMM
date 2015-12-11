@@ -56,7 +56,7 @@
                     </DockPanel.Resources>
                     <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}"/>
                     <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}" 
-                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"/>
+                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}" Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}"/>
                     <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}" Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}"/>
                 </DockPanel>
             </Grid>

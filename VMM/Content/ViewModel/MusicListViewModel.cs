@@ -45,9 +45,12 @@ namespace VMM.Content.ViewModel
         private MusicEntry _selectedSong;
         private ICommand _sortCommand;
 
+        private bool _isReadOnly;
+
         public MusicListViewModel()
         {
             MusicPlayer.Instance.PlaybackStopped += delegate { PlayNext(); };
+            _isReadOnly = SettingsVault.Read().ReadOnly;
         }
 
 
@@ -69,6 +72,11 @@ namespace VMM.Content.ViewModel
                 _isBusy = value;
                 OnPropertyChanged("IsBusy");
             }
+        }
+
+        public bool CanEdit
+        {
+            get { return !_isReadOnly; }
         }
 
         public string BusyText
@@ -104,7 +112,7 @@ namespace VMM.Content.ViewModel
 
         public bool IsModified
         {
-            get { return _isModified; }
+            get { return !_isReadOnly && _isModified; }
             set
             {
                 _isModified = value;

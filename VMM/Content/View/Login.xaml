@@ -17,7 +17,7 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="250" />
         </Grid.ColumnDefinitions>
 
         <ProgressBar Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" IsIndeterminate="True"
@@ -31,6 +31,7 @@
         <TextBlock Grid.Row="3" Text="Пароль" Margin="3" />
         <PasswordBox x:Name="PasswordBox" Grid.Row="4" Margin="3" />
 
+        <CheckBox Grid.Row="5" IsChecked="{Binding ReadOnlyAccess, Mode=OneWayToSource}">Только прослушивание</CheckBox>
         <Button Grid.Row="5" Content="Вход" HorizontalAlignment="Right" Margin="5" Command="{Binding LoginCommand}"
                 IsDefault="True" />
     </Grid>

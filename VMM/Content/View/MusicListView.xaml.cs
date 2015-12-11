@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
+﻿using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Windows;
@@ -25,29 +23,12 @@ namespace VMM.Content.View
             MusciView.SelectionChanged += MusciViewOnSelectionChanged;
 
 
-            Style itemContainerStyle = MusciView.ItemContainerStyle ?? new Style(typeof(ListViewItem));
+            var itemContainerStyle = MusciView.ItemContainerStyle ?? new Style(typeof(ListViewItem));
             itemContainerStyle.Setters.Add(new Setter(AllowDropProperty, true));
             itemContainerStyle.Setters.Add(new EventSetter(PreviewMouseMoveEvent, new MouseEventHandler(MusciViewOnPreviewMouseMove)));
             itemContainerStyle.Setters.Add(new EventSetter(DropEvent, new DragEventHandler(MusciViewOnDrop)));
             itemContainerStyle.Setters.Add(new EventSetter(DragOverEvent, new DragEventHandler(MusicViewDragOver)));
             MusciView.ItemContainerStyle = itemContainerStyle;
-        }
-
-        private void MusicViewDragOver(object sender, DragEventArgs e)
-        {
-            const int scrollThreshold = 25;
-            const int scrollOffset = 3;
-
-            var pos = e.GetPosition(MusciView);
-            var scrollView = UiTreeHelper.FindOfType(MusciView, typeof(ScrollViewer)) as ScrollViewer;
-
-            if (scrollView != null)
-            {
-                if (pos.Y < scrollThreshold)
-                    scrollView.ScrollToVerticalOffset(scrollView.VerticalOffset - scrollOffset);
-                else if (pos.Y > MusciView.ActualHeight - scrollThreshold)
-                    scrollView.ScrollToVerticalOffset(scrollView.VerticalOffset + scrollOffset);
-            }
         }
 
 
@@ -60,8 +41,8 @@ namespace VMM.Content.View
         {
             get
             {
-                IEnumerable<MusicEntry> o = MusciView.SelectedItems.Cast<MusicEntry>();
-                MusicEntry[] x = o.ToArray();
+                var o = MusciView.SelectedItems.Cast<MusicEntry>();
+                var x = o.ToArray();
                 Model.SelectedItems = x;
 
                 return x;
@@ -70,12 +51,29 @@ namespace VMM.Content.View
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private void MusicViewDragOver(object sender, DragEventArgs e)
+        {
+            const int scrollThreshold = 25;
+            const int scrollOffset = 3;
+
+            var pos = e.GetPosition(MusciView);
+            var scrollView = UiTreeHelper.FindOfType(MusciView, typeof(ScrollViewer)) as ScrollViewer;
+
+            if(scrollView != null)
+            {
+                if(pos.Y < scrollThreshold)
+                    scrollView.ScrollToVerticalOffset(scrollView.VerticalOffset - scrollOffset);
+                else if(pos.Y > MusciView.ActualHeight - scrollThreshold)
+                    scrollView.ScrollToVerticalOffset(scrollView.VerticalOffset + scrollOffset);
+            }
+        }
+
         private void MusciViewOnPreviewMouseMove(object sender, MouseEventArgs eventArgs)
         {
             var draggedItem = sender as ListViewItem;
 
-            if (draggedItem != null && eventArgs.LeftButton == MouseButtonState.Pressed
-                && !(eventArgs.OriginalSource is Button))
+            if(draggedItem != null && eventArgs.LeftButton == MouseButtonState.Pressed
+               && !(eventArgs.OriginalSource is Button))
             {
                 DragDrop.DoDragDrop(draggedItem, draggedItem.DataContext, DragDropEffects.Move);
                 draggedItem.IsSelected = true;
@@ -85,10 +83,10 @@ namespace VMM.Content.View
         private void MusciViewOnDrop(object sender, DragEventArgs dragEventArgs)
         {
             var droppedData = dragEventArgs.Data.GetData(typeof(MusicEntry)) as MusicEntry;
-            var target = ((ListViewItem)(sender)).DataContext as MusicEntry;
+            var target = ((ListViewItem)sender).DataContext as MusicEntry;
 
-            int srcIndex = Model.Music.IndexOf(droppedData);
-            int targetIndex = Model.Music.IndexOf(target);
+            var srcIndex = Model.Music.IndexOf(droppedData);
+            var targetIndex = Model.Music.IndexOf(target);
 
             Model.MoveSong(srcIndex, targetIndex);
         }
@@ -100,7 +98,7 @@ namespace VMM.Content.View
 
         private void ViewLoaded(object sender, RoutedEventArgs e)
         {
-            if (Model.Music.Count == 0 && Vk.Instance.LoggedIn)
+            if(Model.Music.Count == 0 && Vk.Instance.LoggedIn)
             {
                 Model.Refresh();
             }
@@ -109,8 +107,8 @@ namespace VMM.Content.View
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }

@@ -14,14 +14,19 @@
             <RowDefinition Height="*" />
         </Grid.RowDefinitions>
 
-        <ListView x:Name="MusciView" Grid.Row="1" ItemsSource="{Binding Music}" SelectionMode="Extended" SelectedItem="{Binding SelectedSong}"
-                  ScrollViewer.HorizontalScrollBarVisibility="Disabled" >
+        <ListView x:Name="MusciView" Grid.Row="1" ItemsSource="{Binding Music}" SelectionMode="Extended"
+                  SelectedItem="{Binding SelectedSong}"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled">
             <ListView.ContextMenu>
                 <ContextMenu>
-                    <MenuItem Header="Скачать" Command="{Binding SaveSelectedCommand}" CommandParameter="{Binding SelectedItems}"/>
-                    <MenuItem Header="Сортировать" Command="{Binding SortCommand}" CommandParameter="{Binding SelectedItems}"/>
-                    <Separator/>
-                    <MenuItem Header="Удалить" Command="{Binding RemoveSelectedCommand}" CommandParameter="{Binding SelectedItems}"/>
+                    <MenuItem Header="Скачать" Command="{Binding SaveSelectedCommand}"
+                              CommandParameter="{Binding SelectedItems}" />
+                    <MenuItem Header="Сортировать" Command="{Binding SortCommand}"
+                              CommandParameter="{Binding SelectedItems}" />
+                    <Separator Visibility="{Binding Path=CanEdit, Converter={StaticResource BoolToVisible}}" />
+                    <MenuItem Header="Удалить" Command="{Binding RemoveSelectedCommand}"
+                              CommandParameter="{Binding SelectedItems}"
+                              Visibility="{Binding Path=CanEdit, Converter={StaticResource BoolToVisible}}" />
                 </ContextMenu>
             </ListView.ContextMenu>
             <ListView.ItemContainerStyle>

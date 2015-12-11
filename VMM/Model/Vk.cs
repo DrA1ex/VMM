@@ -82,7 +82,7 @@ namespace VMM.Model
             }
         }
 
-        public AuthorizationResults Authorize(string login, string password)
+        public AuthorizationResults Authorize(string login, string password, bool readOnly)
         {
             try
             {
@@ -101,6 +101,7 @@ namespace VMM.Model
                 var settings = SettingsVault.Read();
                 settings.Token = AccessToken;
                 settings.UserId = UserId;
+                settings.ReadOnly = readOnly;
                 SettingsVault.Write(settings);
 
                 LoggedIn = true;

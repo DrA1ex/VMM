@@ -78,6 +78,7 @@
             <mui:ModernButton Margin="3" EllipseDiameter="24" IconHeight="14" IconWidth="14"
                               IconData="{StaticResource RemoveIcon}"
                               Command="{Binding Path=DataContext.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
+                              Visibility="{Binding Path=DataContext.CanEdit, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}, Converter={StaticResource BoolToVisible}}"
                               CommandParameter="{Binding}" />
         </DockPanel>
 

@@ -27,6 +27,8 @@ namespace VMM.Content.ViewModel
 
         public string Email { get; set; }
 
+        public bool ReadOnlyAccess { get; set; }    
+
         public bool IsBusy
         {
             get { return _isBusy; }
@@ -48,7 +50,7 @@ namespace VMM.Content.ViewModel
                      {
                          try
                          {
-                             AuthorizationResults results = Vk.Instance.Authorize(Email, GetPasswordMethod());
+                             AuthorizationResults results = Vk.Instance.Authorize(Email, GetPasswordMethod(), ReadOnlyAccess);
 
                              if (results.Success)
                              {

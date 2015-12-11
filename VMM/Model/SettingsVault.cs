@@ -76,5 +76,6 @@ namespace VMM.Model
     {
         public string Token { get; set; }
         public long UserId { get; set; }
+        public bool ReadOnly { get; set; }
     }
 }
