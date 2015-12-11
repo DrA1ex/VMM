@@ -13,7 +13,7 @@
 
     public class DeleteSong
     {
-        public long SongId { get; set; }
+        public ulong SongId { get; set; }
     }
 
 }

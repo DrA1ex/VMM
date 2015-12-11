@@ -15,6 +15,7 @@ using System.Windows.Threading;
 using FirstFloor.ModernUI.Windows.Controls;
 using VkNet.Enums;
 using VkNet.Model;
+using VkNet.Model.Attachments;
 using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
@@ -256,7 +257,7 @@ namespace VMM.Content.ViewModel
                                       try
                                       {
                                           ReadOnlyCollection<AudioAlbum> albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
-                                          ReadOnlyCollection<Audio> musicList = Vk.Instance.Api.Audio.Get(Vk.Instance.UserId);
+                                          ReadOnlyCollection<Audio> musicList = Vk.Instance.Api.Audio.Get((ulong)Vk.Instance.UserId);
 
                                           foreach (Audio musicEntry in musicList)
                                           {
@@ -264,7 +265,7 @@ namespace VMM.Content.ViewModel
 
                                               var entry = new MusicEntry
                                                           {
-                                                              Id = song.Id,
+                                                              Id = (ulong)song.Id,
                                                               Artist = song.Artist,
                                                               Name = song.Title,
                                                               Genre = song.Genre ?? AudioGenre.Other,
@@ -372,10 +373,10 @@ namespace VMM.Content.ViewModel
                              for (int i = 0; i < Music.Count; i++)
                              {
                                  MusicEntry entry = Music[i];
-                                 long previosId = i != 0 ? Music[i - 1].Id : 0;
-                                 long nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
+                                 ulong previosId = i != 0 ? Music[i - 1].Id : 0;
+                                 ulong nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
 
-                                 Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, previosId, nextId);
+                                 Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previosId, (long)nextId);
 
                                  disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 

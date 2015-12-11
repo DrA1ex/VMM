@@ -21,12 +21,12 @@ namespace VMM.Model
         {
             Instance = new Vk();
 
-            Settings settings = SettingsVault.Read();
+            var settings = SettingsVault.Read();
 
             Instance.AccessToken = settings.Token;
             Instance.UserId = settings.UserId;
 
-            if (!String.IsNullOrEmpty(Instance.AccessToken))
+            if(!string.IsNullOrEmpty(Instance.AccessToken))
             {
                 Instance.Authorize(Instance.AccessToken);
             }
@@ -37,14 +37,13 @@ namespace VMM.Model
         }
 
 
-
         public WebClient Client
         {
             get { return _client ?? (_client = new WebClient()); }
         }
 
 
-        public static Vk Instance { get; private set; }
+        public static Vk Instance { get; }
 
         public VkApi Api
         {
@@ -59,7 +58,7 @@ namespace VMM.Model
             set
             {
                 _accessToken = value;
-                OnPropertyChanged("AccessToken");
+                OnPropertyChanged();
             }
         }
 
@@ -69,7 +68,7 @@ namespace VMM.Model
             set
             {
                 _userId = value;
-                OnPropertyChanged("UserId");
+                OnPropertyChanged();
             }
         }
 
@@ -79,7 +78,7 @@ namespace VMM.Model
             set
             {
                 _loggedIn = value;
-                OnPropertyChanged("LoggedIn");
+                OnPropertyChanged();
             }
         }
 
@@ -88,45 +87,53 @@ namespace VMM.Model
             try
             {
                 //We set flag Offline, so token will newer expired
-                Api.Authorize(AppId, login, password, VkNet.Enums.Settings.Audio | VkNet.Enums.Settings.Offline);
+                Api.Authorize(new ApiAuthParams
+                {
+                    ApplicationId = AppId,
+                    Login = login,
+                    Password = password,
+                    Settings = VkNet.Enums.Filters.Settings.Audio | VkNet.Enums.Filters.Settings.Offline
+                });
 
                 AccessToken = (string)ReflectionHelper.GetPropertyValue(Api, "AccessToken");
                 UserId = Api.UserId ?? 0;
 
-                Settings settings = SettingsVault.Read();
+                var settings = SettingsVault.Read();
                 settings.Token = AccessToken;
                 settings.UserId = UserId;
                 SettingsVault.Write(settings);
 
                 LoggedIn = true;
 
-                return new AuthorizationResults { Success = true };
+                return new AuthorizationResults {Success = true};
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                return new AuthorizationResults { Success = false, Message = e.Message };
+                return new AuthorizationResults {Success = false, Message = e.Message};
             }
         }
 
         public AuthorizationResults Authorize(string token)
         {
-            if (String.IsNullOrEmpty(AccessToken))
+            if(string.IsNullOrEmpty(AccessToken))
             {
-                return new AuthorizationResults { Success = false, Message = "Access Token is missing" };
+                return new AuthorizationResults {Success = false, Message = "Access Token is missing"};
             }
 
             try
             {
                 Api.Authorize(AccessToken);
+
+                // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
                 Api.Users.IsAppUser(UserId); //Dummy call, throw exception if authorization failed
 
                 LoggedIn = true;
 
-                return new AuthorizationResults { Success = true };
+                return new AuthorizationResults {Success = true};
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                return new AuthorizationResults { Success = false, Message = e.Message };
+                return new AuthorizationResults {Success = false, Message = e.Message};
             }
         }
 
@@ -136,7 +143,7 @@ namespace VMM.Model
             AccessToken = null;
             LoggedIn = false;
 
-            Settings settings = SettingsVault.Read();
+            var settings = SettingsVault.Read();
             settings.Token = AccessToken;
             SettingsVault.Write(settings);
         }
@@ -148,8 +155,8 @@ namespace VMM.Model
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }
