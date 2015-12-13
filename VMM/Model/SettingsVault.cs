@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.IO.IsolatedStorage;
 using System.Runtime.Serialization.Formatters.Binary;
+using FirstFloor.ModernUI.Presentation;
 
 namespace VMM.Model
 {
@@ -77,5 +78,9 @@ namespace VMM.Model
         public string Token { get; set; }
         public long UserId { get; set; }
         public bool ReadOnly { get; set; }
+
+        public Uri Theme { get; set; }
+        public string AccentColor { get; set; }
+        public FontSize FontSize { get; set; }
     }
 }

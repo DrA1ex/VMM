@@ -1,0 +1,91 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    mc:Ignorable="d"
+                    xmlns:model="clr-namespace:DataLayer.Model;assembly=DataLayer"
+                    xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+                    xmlns:viewModelBase="clr-namespace:DocumentDb.Pages.ViewModel.Base">
+
+    <Style x:Key="IconStyle" TargetType="mui:ModernButton">
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Doc}">
+                <Setter Property="IconData" Value="{StaticResource WordIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.DocX}">
+                <Setter Property="IconData" Value="{StaticResource WordIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Pdf}">
+                <Setter Property="IconData" Value="{StaticResource PdfIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Rtf}">
+                <Setter Property="IconData" Value="{StaticResource RtfIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Text}">
+                <Setter Property="IconData" Value="{StaticResource TextIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Audio}">
+                <Setter Property="IconData" Value="{StaticResource MusicIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Video}">
+                <Setter Property="IconData" Value="{StaticResource VideoIcon}" />
+            </DataTrigger>
+            <DataTrigger Binding="{Binding Type}" Value="{x:Static model:DocumentType.Undefined}">
+                <Setter Property="IconData" Value="{StaticResource GenericFileIcon}" />
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <DataTemplate x:Key="DocumentItemTemplate" DataType="{x:Type model:Document}">
+        <Grid d:DataContext="{d:DesignInstance model:Document}" d:DesignWidth="583" d:DesignHeight="200">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" SharedSizeGroup="IconColumn" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+
+            <Separator x:Name="ItemSeparator" Grid.ColumnSpan="2" Foreground="{StaticResource Accent}" Margin="3,0" Grid.Row="2" />
+
+            <mui:ModernButton
+                ToolTip="{Binding Type, Converter={StaticResource TypeDescriptionToString}}"
+                Style="{StaticResource IconStyle}"
+                Command="{Binding RelativeSource={RelativeSource AncestorType=UserControl}, Path=DataContext.(viewModelBase:NavigationViewModelBase.OpenFileCommand)}"
+                CommandParameter="{Binding}"
+                IconWidth="20" IconHeight="20" EllipseDiameter="38" EllipseStrokeThickness="2"
+                VerticalAlignment="Center" Margin="6"
+                Grid.Row="0"
+                Grid.Column="0" />
+
+            <TextBlock Grid.Row="0" Grid.Column="1" Margin="6" VerticalAlignment="Center"
+                             FontSize="22"
+                             Text="{Binding Name, Converter={StaticResource FileNameToNameWithoutExtensionConverter}, Mode=OneWay}"
+                             TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" />
+
+            <Grid Grid.Row="1" Grid.Column="0" Grid.ColumnSpan="2">
+                <Grid.Resources>
+                    <Style TargetType="TextBlock">
+                        <Setter Property="Margin" Value="6" />
+                        <Setter Property="Foreground" Value="{DynamicResource WindowTextReadOnly}" />
+                        <Setter Property="VerticalAlignment" Value="Center" />
+                    </Style>
+                </Grid.Resources>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="CacheColumn" />
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="LastEditIcon" />
+                    <ColumnDefinition Width="Auto" SharedSizeGroup="LastEditText" />
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Text="{Binding Cached, Converter={StaticResource CacheStateConverter}, Mode=OneWay}" />
+
+                <TextBlock Grid.Column="3"
+                           Text="{Binding LastEditDateTime, Converter={StaticResource DateTimeConverter}, Mode=OneWay}" />
+            </Grid>
+        </Grid>
+    </DataTemplate>
+</ResourceDictionary>

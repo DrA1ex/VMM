@@ -1,0 +1,22 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+                    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+                    mc:Ignorable="d"
+                    xmlns:model="clr-namespace:DocumentDb.Pages.Model">
+
+    <Style x:Key="FolderChildrenStyle" TargetType="TextBlock">
+        <Style.Triggers>
+            <DataTrigger d:DataContext="{d:DesignInstance model:Folder}" Binding="{Binding HasChildren}" Value="False">
+                <Setter Property="Foreground" Value="{DynamicResource WindowTextReadOnly}"/>
+            </DataTrigger>
+        </Style.Triggers>
+    </Style>
+
+    <HierarchicalDataTemplate DataType="{x:Type model:Folder}"
+                              ItemsSource="{Binding FoldersSource}">
+        <TextBlock Text="{Binding Name, Mode=OneWay}" TextWrapping="Wrap" TextTrimming="CharacterEllipsis"
+                   Style="{StaticResource FolderChildrenStyle}" ToolTip="{Binding Path=FullPath, Mode=OneWay}">
+        </TextBlock>
+    </HierarchicalDataTemplate>
+</ResourceDictionary>

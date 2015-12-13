@@ -7,6 +7,10 @@
                   ContentSource="/Pages/MainPage.xaml"
                   Closed="OnClosed">
 
+    <mui:ModernWindow.TitleLinks>
+        <mui:Link DisplayName="Настройки" Source="/Pages/Settings.xaml" />
+    </mui:ModernWindow.TitleLinks>
+
     <mui:ModernWindow.MenuLinkGroups>
         <mui:LinkGroup DisplayName="Менеджер музыки Вконтакте">
             <mui:LinkGroup.Links>

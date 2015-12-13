@@ -17,11 +17,11 @@
                 <RowDefinition Height="Auto" />
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
-            <Separator BorderThickness="1" BorderBrush="{StaticResource Accent}" VerticalAlignment="Top" />
+            <Separator BorderThickness="1" BorderBrush="{DynamicResource Accent}" VerticalAlignment="Top" />
 
             <Border Grid.Row="1" Background="#4C000000"
                     Visibility="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolToVisible}}">
-                <Border Background="{StaticResource WindowBackground}" Height="150" VerticalAlignment="Center">
+                <Border Background="{DynamicResource WindowBackground}" Height="150" VerticalAlignment="Center">
                     <DockPanel>
                         <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}"
                                    Style="{StaticResource Heading2}"
