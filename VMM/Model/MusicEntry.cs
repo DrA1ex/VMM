@@ -33,7 +33,7 @@ namespace VMM.Model
             set
             {
                 _isDeleted = value;
-                OnPropertyChanged("IsDeleted");
+                OnPropertyChanged(nameof(IsDeleted));
             }
         }
 
@@ -44,7 +44,7 @@ namespace VMM.Model
             set
             {
                 _modified = value;
-                OnPropertyChanged("Modified");
+                OnPropertyChanged(nameof(Modified));
             }
         }
 
@@ -54,7 +54,7 @@ namespace VMM.Model
             set
             {
                 _isPlaying = value;
-                OnPropertyChanged("IsPlaying");
+                OnPropertyChanged(nameof(IsPlaying));
             }
         }
 
@@ -64,7 +64,7 @@ namespace VMM.Model
             set
             {
                 _isLoading = value;
-                OnPropertyChanged("IsLoading");
+                OnPropertyChanged(nameof(IsLoading));
             }
         }
 
@@ -74,64 +74,31 @@ namespace VMM.Model
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 
     internal class MusicEntryDesign
     {
-        public long Id
-        {
-            get { return 123456; }
-        }
+        public long Id => 123456;
 
-        public string Artist
-        {
-            get { return "Three Days Grace"; }
-        }
+        public string Artist => "Three Days Grace";
 
-        public string Name
-        {
-            get { return "Never Too Late"; }
-        }
+        public string Name => "Never Too Late";
 
-        public AudioGenre Genre
-        {
-            get { return AudioGenre.Rock; }
-        }
+        public AudioGenre Genre => AudioGenre.Rock;
 
-        public AudioAlbum Album
-        {
-            get { return new AudioAlbum { Title = "One-X" }; }
-        }
+        public AudioAlbum Album => new AudioAlbum {Title = "One-X"};
 
-        public int Duration
-        {
-            get { return 3 * 60 + 31; }
-        }
+        public int Duration => 3 * 60 + 31;
 
-        public Uri Url
-        {
-            get { return new Uri("http:\\examle.com"); }
-        }
+        public Uri Url => new Uri("http:\\examle.com");
 
-        public bool IsDeleted
-        {
-            get { return false; }
-        }
+        public bool IsDeleted => false;
 
-        public bool IsPlaying
-        {
-            get { return false; }
-        }
+        public bool IsPlaying => false;
 
-        public bool IsLoading
-        {
-            get { return true; }
-        }
+        public bool IsLoading => true;
     }
 }

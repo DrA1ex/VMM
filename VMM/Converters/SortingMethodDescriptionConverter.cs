@@ -8,7 +8,7 @@ namespace VMM.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool descending = value is bool && (bool)value;
+            var descending = value is bool && (bool)value;
             return descending ? "По убыванию" : "По возрастанию";
         }
 

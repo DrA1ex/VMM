@@ -9,11 +9,6 @@ namespace VMM.Dialog
     {
         private SortSettingsViewModel _model;
 
-        public SortSettingsViewModel Model
-        {
-            get { return _model ?? (_model = new SortSettingsViewModel()); }
-        }
-
         public SortSettings()
         {
             InitializeComponent();
@@ -21,15 +16,11 @@ namespace VMM.Dialog
             DataContext = Model;
         }
 
-        public SortingPath[] SortingPaths
-        {
-            get
-            {
-                return Model.SortingPaths.Any() ?
-                    Model.SelectedPaths.ToArray() :
-                    new[] { Model.PrimarySortingPath };
-            }
-        }
+        public SortSettingsViewModel Model => _model ?? (_model = new SortSettingsViewModel());
+
+        public SortingPath[] SortingPaths => Model.SortingPaths.Any()
+            ? Model.SelectedPaths.ToArray()
+            : new[] {Model.PrimarySortingPath};
 
         private void OkClicked(object sender, RoutedEventArgs e)
         {

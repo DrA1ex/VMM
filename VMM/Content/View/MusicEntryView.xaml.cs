@@ -21,7 +21,7 @@ namespace VMM.Content.View
 
         private void ControlLoaded(object sender, RoutedEventArgs e)
         {
-            if (DataContext != Model)
+            if(DataContext != Model)
             {
                 //We receive data context from MusicListView, but we have another one
                 Grid.DataContext = DataContext;

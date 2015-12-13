@@ -7,7 +7,8 @@
                   xmlns:viewModel="clr-namespace:VMM.Dialog.ViewModel"
                   xmlns:dialog="clr-namespace:VMM.Dialog" WindowStartupLocation="CenterOwner"
                   mc:Ignorable="d" Style="{DynamicResource EmptyWindow}" ResizeMode="NoResize"
-                  Title="Настройка сортировки" d:DataContext="{d:DesignInstance viewModel:SortSettingsViewModel}" Height="300" Width="450">
+                  Title="Настройка сортировки" d:DataContext="{d:DesignInstance viewModel:SortSettingsViewModel}"
+                  Height="300" Width="450">
     <Grid Margin="5,0,5,5">
         <Grid.Resources>
             <Style TargetType="{x:Type mui:ModernButton}">
@@ -26,11 +27,11 @@
         </Grid.RowDefinitions>
 
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="150" SharedSizeGroup="Description"/>
-            <ColumnDefinition Width="150" SharedSizeGroup="SortPath"/>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod"/>
-            <ColumnDefinition Width="Auto" SharedSizeGroup="Action"/>
-            <ColumnDefinition SharedSizeGroup="Dummy"/>
+            <ColumnDefinition Width="150" SharedSizeGroup="Description" />
+            <ColumnDefinition Width="150" SharedSizeGroup="SortPath" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod" />
+            <ColumnDefinition Width="Auto" SharedSizeGroup="Action" />
+            <ColumnDefinition SharedSizeGroup="Dummy" />
         </Grid.ColumnDefinitions>
 
         <StackPanel Grid.ColumnSpan="5" Margin="5,3,5,15">
@@ -41,7 +42,7 @@
             <Separator BorderThickness="1" BorderBrush="{StaticResource Accent}" VerticalAlignment="Top" />
         </StackPanel>
 
-        <TextBlock Text="Сортировка по:" Grid.Row="1" Grid.Column="0" Margin="23,3,3,3" HorizontalAlignment="Left"/>
+        <TextBlock Text="Сортировка по:" Grid.Row="1" Grid.Column="0" Margin="23,3,3,3" HorizontalAlignment="Left" />
 
 
         <!-- Primary sorting path -->
@@ -61,16 +62,17 @@
 
         <!-- Addition sorting pathes -->
 
-        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" ItemsSource="{Binding SelectedPaths}" Grid.IsSharedSizeScope="True" Margin="0,3">
+        <ItemsControl Grid.Row="2" Grid.Column="0" Grid.ColumnSpan="5" ItemsSource="{Binding SelectedPaths}"
+                      Grid.IsSharedSizeScope="True" Margin="0,3">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
                     <Grid Margin="0,3,0,3">
                         <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="150" SharedSizeGroup="Description"/>
-                            <ColumnDefinition Width="150" SharedSizeGroup="SortPath"/>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod"/>
-                            <ColumnDefinition Width="Auto" SharedSizeGroup="Action"/>
-                            <ColumnDefinition SharedSizeGroup="Dummy"/>
+                            <ColumnDefinition Width="150" SharedSizeGroup="Description" />
+                            <ColumnDefinition Width="150" SharedSizeGroup="SortPath" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod" />
+                            <ColumnDefinition Width="Auto" SharedSizeGroup="Action" />
+                            <ColumnDefinition SharedSizeGroup="Dummy" />
                         </Grid.ColumnDefinitions>
 
                         <TextBlock Text="Затем по:" Grid.Column="0" Margin="43,3,3,3" HorizontalAlignment="Left" />
@@ -78,13 +80,14 @@
                         <TextBlock Grid.Column="1" Margin="3" Text="{Binding DisplayName}" />
 
                         <mui:ModernButton Grid.Column="2" EllipseStrokeThickness="0" Margin="3"
-                          IconData="{Binding Descending ,Converter={StaticResource DescendingToIconData}}"
-                          ToolTip="{Binding Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
-                          Command="{Binding DataContext.InvertSortDirectionCommand, RelativeSource={RelativeSource AncestorType={x:Type dialog:SortSettings}}}"
-                          CommandParameter="{Binding}" />
+                                          IconData="{Binding Descending ,Converter={StaticResource DescendingToIconData}}"
+                                          ToolTip="{Binding Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
+                                          Command="{Binding DataContext.InvertSortDirectionCommand, RelativeSource={RelativeSource AncestorType={x:Type dialog:SortSettings}}}"
+                                          CommandParameter="{Binding}" />
 
-                        <Button Grid.Column="3" Content="X" Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dialog:SortSettings}}, Path=DataContext.RomoveSortingPathCommand}"
-                                CommandParameter="{Binding}"/>
+                        <Button Grid.Column="3" Content="X"
+                                Command="{Binding RelativeSource={RelativeSource AncestorType={x:Type dialog:SortSettings}}, Path=DataContext.RemoveSortingPathCommand}"
+                                CommandParameter="{Binding}" />
                     </Grid>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -92,32 +95,35 @@
 
         <!-- Sorting path selector -->
 
-        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" Grid.IsSharedSizeScope="True" Visibility="{Binding SortingPaths.Count, Converter={StaticResource BoolToVisible}}">
+        <Grid Grid.Row="3" Grid.Column="0" Grid.ColumnSpan="5" Grid.IsSharedSizeScope="True"
+              Visibility="{Binding SortingPaths.Count, Converter={StaticResource BoolToVisible}}">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="150" SharedSizeGroup="Description"/>
-                <ColumnDefinition Width="150" SharedSizeGroup="SortPath"/>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod"/>
-                <ColumnDefinition Width="Auto" SharedSizeGroup="Action"/>
-                <ColumnDefinition SharedSizeGroup="Dummy"/>
+                <ColumnDefinition Width="150" SharedSizeGroup="Description" />
+                <ColumnDefinition Width="150" SharedSizeGroup="SortPath" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="SortMethod" />
+                <ColumnDefinition Width="Auto" SharedSizeGroup="Action" />
+                <ColumnDefinition SharedSizeGroup="Dummy" />
             </Grid.ColumnDefinitions>
 
             <TextBlock Text="Добавить:" Grid.Column="0" Margin="23,3,3,3" HorizontalAlignment="Left" />
 
-            <ComboBox  Grid.Column="1" ItemsSource="{Binding SortingPaths}"
-                  SelectedItem="{Binding SelectedSortingPath}" DisplayMemberPath="DisplayName"
-                  Margin="3" />
+            <ComboBox Grid.Column="1" ItemsSource="{Binding SortingPaths}"
+                      SelectedItem="{Binding SelectedSortingPath}" DisplayMemberPath="DisplayName"
+                      Margin="3" />
 
             <mui:ModernButton Grid.Column="2" EllipseStrokeThickness="0" Margin="3"
-                          IconData="{Binding SelectedSortingPath.Descending ,Converter={StaticResource DescendingToIconData}}"
-                          ToolTip="{Binding SelectedSortingPath.Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
-                          Command="{Binding InvertSortDirectionCommand}"
-                          CommandParameter="{Binding SelectedSortingPath}" />
-            <Button Grid.Column="3" Content="+" Command="{Binding AddNewSortingPathCommand}" CommandParameter="{Binding SelectedSortingPath}"/>
+                              IconData="{Binding SelectedSortingPath.Descending ,Converter={StaticResource DescendingToIconData}}"
+                              ToolTip="{Binding SelectedSortingPath.Descending, Converter={StaticResource SortingMethodDescriptionConverter}}"
+                              Command="{Binding InvertSortDirectionCommand}"
+                              CommandParameter="{Binding SelectedSortingPath}" />
+            <Button Grid.Column="3" Content="+" Command="{Binding AddNewSortingPathCommand}"
+                    CommandParameter="{Binding SelectedSortingPath}" />
         </Grid>
 
-        <DockPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Bottom" HorizontalAlignment="Right"> 
-            <Button Content="Ок" Margin="5" Click="OkClicked"/>
-            <Button Content="Отмена" Margin="5" Click="CancelClicked"/>
+        <DockPanel Grid.Row="4" Grid.Column="0" Grid.ColumnSpan="5" VerticalAlignment="Bottom"
+                   HorizontalAlignment="Right">
+            <Button Content="Ок" Margin="5" Click="OkClicked" />
+            <Button Content="Отмена" Margin="5" Click="CancelClicked" />
         </DockPanel>
 
     </Grid>

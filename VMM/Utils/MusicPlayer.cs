@@ -4,7 +4,6 @@ using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using JetBrains.Annotations;
-using NAudio.Utils;
 using NAudio.Wave;
 using VMM.Helper;
 using VMM.Model;
@@ -14,6 +13,8 @@ namespace VMM.Utils
     public class MusicPlayer : IDisposable, INotifyPropertyChanged
     {
         private MusicEntry _currentSong;
+
+        private DispatcherTimer _seekTimer;
 
         static MusicPlayer()
         {
@@ -26,21 +27,16 @@ namespace VMM.Utils
             WaveOut.PlaybackStopped += OnPlaybackStopped;
 
             SeekTimer.Interval = TimeSpan.FromSeconds(0.33);
-            SeekTimer.Tick += (sender, args) => OnPropertyChanged("Seek");
+            SeekTimer.Tick += (sender, args) => OnPropertyChanged(nameof(Seek));
         }
 
 
         public static MusicPlayer Instance { get; private set; }
 
-        private WaveOut WaveOut { get; set; }
+        private WaveOut WaveOut { get; }
         private Mp3FileReader Reader { get; set; }
 
-        private DispatcherTimer _seekTimer;
-
-        public DispatcherTimer SeekTimer
-        {
-            get { return _seekTimer ?? (_seekTimer = new DispatcherTimer()); }
-        }
+        public DispatcherTimer SeekTimer => _seekTimer ?? (_seekTimer = new DispatcherTimer());
 
         public double Volume
         {
@@ -50,15 +46,8 @@ namespace VMM.Utils
 
         public double Seek
         {
-            get
-            {
-                return Reader != null && WaveOut.PlaybackState != PlaybackState.Stopped ? (double)Reader.Position / Reader.Length : 0.0;
-            }
-            set
-            {
-                if (Reader != null)
-                    Reader.Seek((long)(value * Reader.Length), SeekOrigin.Begin);
-            }
+            get { return Reader != null && WaveOut.PlaybackState != PlaybackState.Stopped ? (double)Reader.Position / Reader.Length : 0.0; }
+            set { Reader?.Seek((long)(value * Reader.Length), SeekOrigin.Begin); }
         }
 
         public MusicEntry CurrentSong
@@ -67,7 +56,7 @@ namespace VMM.Utils
             set
             {
                 _currentSong = value;
-                OnPropertyChanged("CurrentSong");
+                OnPropertyChanged(nameof(CurrentSong));
             }
         }
 
@@ -77,10 +66,7 @@ namespace VMM.Utils
         {
             GC.SuppressFinalize(this);
 
-            if (Reader != null)
-            {
-                Reader.Dispose();
-            }
+            Reader?.Dispose();
             WaveOut.Dispose();
         }
 
@@ -97,25 +83,22 @@ namespace VMM.Utils
         {
             //PlaybackStopped raised not only when file was ended
             //We need raise event only if playback stopped automatically
-            if (IsStopManualy)
+            if(IsStopManualy)
             {
                 IsStopManualy = false;
                 return;
             }
 
 
-            EventHandler<StoppedEventArgs> handler = PlaybackStopped;
-            if (handler != null)
-            {
-                handler(this, stoppedEventArgs);
-            }
+            var handler = PlaybackStopped;
+            handler?.Invoke(this, stoppedEventArgs);
         }
 
         public void Play(MusicEntry entry)
         {
-            if (CurrentSong == entry)
+            if(CurrentSong == entry)
             {
-                if (WaveOut.PlaybackState == PlaybackState.Playing)
+                if(WaveOut.PlaybackState == PlaybackState.Playing)
                 {
                     Pause();
                 }
@@ -127,19 +110,16 @@ namespace VMM.Utils
                 return;
             }
 
-            if (Reader != null)
-            {
-                Reader.Dispose();
-            }
+            Reader?.Dispose();
 
-            if (CurrentSong != null)
+            if(CurrentSong != null)
             {
                 CurrentSong.IsPlaying = false;
             }
 
             CurrentSong = entry;
-            MemoryStream stream = CacheHelper.Download(entry);
-            Reader = new Mp3FileReader(stream);
+
+            Reader = new Mp3FileReader(CacheHelper.Download(entry));
 
             WaveOut.Init(Reader);
             Play();
@@ -147,8 +127,7 @@ namespace VMM.Utils
 
         public void Stop()
         {
-
-            if (WaveOut.PlaybackState != PlaybackState.Stopped)
+            if(WaveOut.PlaybackState != PlaybackState.Stopped)
             {
                 IsStopManualy = true;
                 WaveOut.Stop();
@@ -156,12 +135,9 @@ namespace VMM.Utils
                 SeekTimer.Stop();
             }
 
-            if (Reader != null)
-            {
-                Reader.Dispose();
-            }
+            Reader?.Dispose();
 
-            if (CurrentSong != null)
+            if(CurrentSong != null)
             {
                 CurrentSong.IsPlaying = false;
             }
@@ -169,7 +145,7 @@ namespace VMM.Utils
 
         public void Pause()
         {
-            if (WaveOut.PlaybackState == PlaybackState.Playing)
+            if(WaveOut.PlaybackState == PlaybackState.Playing)
             {
                 WaveOut.Pause();
                 CurrentSong.IsPlaying = false;
@@ -184,17 +160,14 @@ namespace VMM.Utils
             CurrentSong.IsPlaying = true;
 
             SeekTimer.Start();
-            OnPropertyChanged("Seek");
+            OnPropertyChanged(nameof(Seek));
         }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

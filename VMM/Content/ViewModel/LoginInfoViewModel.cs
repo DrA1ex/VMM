@@ -50,30 +50,30 @@ namespace VMM.Content.ViewModel
         private void Retry()
         {
             IsBusy = true;
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var disp = Dispatcher.CurrentDispatcher;
 
             Task.Run(() =>
-                     {
-                         try
-                         {
-                             Vk.Instance.Authorize(Vk.Instance.AccessToken);
-                         }
-                         catch (Exception e)
-                         {
-                             Trace.WriteLine(String.Format("While retry authorization: {0}", e.Message));
-                         }
-                         finally
-                         {
-                             disp.Invoke(() => { IsBusy = false; });
-                         }
-                     });
+            {
+                try
+                {
+                    Vk.Instance.Authorize(Vk.Instance.AccessToken);
+                }
+                catch(Exception e)
+                {
+                    Trace.WriteLine(string.Format("While retry authorization: {0}", e.Message));
+                }
+                finally
+                {
+                    disp.Invoke(() => { IsBusy = false; });
+                }
+            });
         }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }

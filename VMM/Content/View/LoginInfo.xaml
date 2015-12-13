@@ -11,7 +11,7 @@
     <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource BoolInverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
-            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
             <RowDefinition Height="Auto" />
@@ -22,17 +22,20 @@
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <ProgressBar Grid.ColumnSpan="2" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}" IsIndeterminate="True"
+        <ProgressBar Grid.ColumnSpan="2" Visibility="{Binding IsBusy, Converter={StaticResource BoolToVisible}}"
+                     IsIndeterminate="True"
                      VerticalAlignment="Top" />
 
-        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Text="Сведения об аутентификации" Style="{StaticResource Heading2}"
+        <TextBlock Grid.Row="0" Grid.ColumnSpan="2" Grid.Column="0" Text="Сведения об аутентификации"
+                   Style="{StaticResource Heading2}"
                    Margin="3,3,3,23" />
 
-        <TextBlock Grid.Row="1" Grid.Column="0" Text="Пользователь:" Margin="3,3,13,3"/>
+        <TextBlock Grid.Row="1" Grid.Column="0" Text="Пользователь:" Margin="3,3,13,3" />
         <mui:BBCodeBlock Grid.Row="1" Grid.Column="1"
                          Margin="3">
             <mui:BBCodeBlock.BBCode>
-                <Binding Source="{x:Static model:Vk.Instance}" Path="UserId" StringFormat="[url=https://vk.com/id{0}]{0}[/url]" />
+                <Binding Source="{x:Static model:Vk.Instance}" Path="UserId"
+                         StringFormat="[url=https://vk.com/id{0}]{0}[/url]" />
             </mui:BBCodeBlock.BBCode>
         </mui:BBCodeBlock>
 
@@ -55,7 +58,7 @@
                     Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}"
                     Command="{Binding RetryCommand}" />
             <Button Content="Сменить аккаунт" HorizontalAlignment="Right" Margin="5"
-                    Command="{Binding ChangeAccountCommand}"/>
+                    Command="{Binding ChangeAccountCommand}" />
         </DockPanel>
 
     </Grid>

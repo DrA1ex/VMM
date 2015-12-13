@@ -8,17 +8,17 @@ namespace VMM.Helper
     {
         public static DependencyObject FindOfType(DependencyObject src, Type type)
         {
-            if (src.GetType() == type)
+            if(src.GetType() == type)
             {
                 return src;
             }
 
-            for (int i = 0; i < VisualTreeHelper.GetChildrenCount(src); i++)
+            for(var i = 0; i < VisualTreeHelper.GetChildrenCount(src); i++)
             {
-                DependencyObject child = VisualTreeHelper.GetChild(src, i);
+                var child = VisualTreeHelper.GetChild(src, i);
 
-                DependencyObject result = FindOfType(child, type);
-                if (result == null)
+                var result = FindOfType(child, type);
+                if(result == null)
                 {
                     continue;
                 }

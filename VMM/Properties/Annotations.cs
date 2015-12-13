@@ -27,7 +27,7 @@ namespace VMM.Annotations
     [AttributeUsage(
         AttributeTargets.Method | AttributeTargets.Parameter |
         AttributeTargets.Property | AttributeTargets.Delegate |
-        AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+        AttributeTargets.Field)]
     public sealed class CanBeNullAttribute : Attribute
     {
     }
@@ -45,7 +45,7 @@ namespace VMM.Annotations
     [AttributeUsage(
         AttributeTargets.Method | AttributeTargets.Parameter |
         AttributeTargets.Property | AttributeTargets.Delegate |
-        AttributeTargets.Field, AllowMultiple = false, Inherited = true)]
+        AttributeTargets.Field)]
     public sealed class NotNullAttribute : Attribute
     {
     }
@@ -65,8 +65,7 @@ namespace VMM.Annotations
     /// </code>
     /// </example>
     [AttributeUsage(
-        AttributeTargets.Constructor | AttributeTargets.Method,
-        AllowMultiple = false, Inherited = true)]
+        AttributeTargets.Constructor | AttributeTargets.Method)]
     public sealed class StringFormatMethodAttribute : Attribute
     {
         /// <param name="formatParameterName">
@@ -93,7 +92,7 @@ namespace VMM.Annotations
     /// }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Parameter, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class InvokerParameterNameAttribute : Attribute
     {
     }
@@ -153,7 +152,7 @@ namespace VMM.Annotations
     ///         </item>
     ///     </list>
     /// </example>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class NotifyPropertyChangedInvocatorAttribute : Attribute
     {
         public NotifyPropertyChangedInvocatorAttribute()
@@ -222,7 +221,7 @@ namespace VMM.Annotations
     ///         </item>
     ///     </list>
     /// </examples>
-    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method, AllowMultiple = true)]
     public sealed class ContractAnnotationAttribute : Attribute
     {
         public ContractAnnotationAttribute([NotNull] string contract)
@@ -251,7 +250,7 @@ namespace VMM.Annotations
     /// }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.All)]
     public sealed class LocalizationRequiredAttribute : Attribute
     {
         public LocalizationRequiredAttribute() : this(true)
@@ -289,7 +288,7 @@ namespace VMM.Annotations
     /// </example>
     [AttributeUsage(
         AttributeTargets.Interface | AttributeTargets.Class |
-        AttributeTargets.Struct, AllowMultiple = false, Inherited = true)]
+        AttributeTargets.Struct)]
     public sealed class CannotApplyEqualityOperatorAttribute : Attribute
     {
     }
@@ -306,8 +305,8 @@ namespace VMM.Annotations
     /// public class MyComponent : IComponent { }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true, Inherited = true)]
-    [BaseTypeRequired(typeof (Attribute))]
+    [AttributeUsage(AttributeTargets.Class, AllowMultiple = true)]
+    [BaseTypeRequired(typeof(Attribute))]
     public sealed class BaseTypeRequiredAttribute : Attribute
     {
         public BaseTypeRequiredAttribute([NotNull] Type baseType)
@@ -324,7 +323,7 @@ namespace VMM.Annotations
     ///     (e.g. via reflection, in external library), so this symbol
     ///     will not be marked as unused (as well as by other usage inspections)
     /// </summary>
-    [AttributeUsage(AttributeTargets.All, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.All)]
     public sealed class UsedImplicitlyAttribute : Attribute
     {
         public UsedImplicitlyAttribute()
@@ -358,7 +357,7 @@ namespace VMM.Annotations
     ///     to not mark symbols marked with such attributes as unused
     ///     (as well as by other usage inspections)
     /// </summary>
-    [AttributeUsage(AttributeTargets.Class, AllowMultiple = false, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Class)]
     public sealed class MeansImplicitUseAttribute : Attribute
     {
         public MeansImplicitUseAttribute()
@@ -408,7 +407,7 @@ namespace VMM.Annotations
         InstantiatedWithFixedConstructorSignature = 4,
 
         /// <summary>Indicates implicit instantiation of a type</summary>
-        InstantiatedNoFixedConstructorSignature = 8,
+        InstantiatedNoFixedConstructorSignature = 8
     }
 
     /// <summary>
@@ -456,7 +455,7 @@ namespace VMM.Annotations
     ///     If the parameter is an enumerable, indicates that it is enumerated
     ///     while the method is executed
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Parameter)]
     public sealed class InstantHandleAttribute : Attribute
     {
     }
@@ -474,7 +473,7 @@ namespace VMM.Annotations
     /// }
     /// </code>
     /// </example>
-    [AttributeUsage(AttributeTargets.Method, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Method)]
     public sealed class PureAttribute : Attribute
     {
     }
@@ -718,7 +717,7 @@ namespace VMM.Annotations
 
     [AttributeUsage(
         AttributeTargets.Parameter | AttributeTargets.Property |
-        AttributeTargets.Field, Inherited = true)]
+        AttributeTargets.Field)]
     public sealed class HtmlElementAttributesAttribute : Attribute
     {
         public HtmlElementAttributesAttribute()
@@ -736,7 +735,7 @@ namespace VMM.Annotations
 
     [AttributeUsage(
         AttributeTargets.Parameter | AttributeTargets.Field |
-        AttributeTargets.Property, Inherited = true)]
+        AttributeTargets.Property)]
     public sealed class HtmlAttributeValueAttribute : Attribute
     {
         public HtmlAttributeValueAttribute([NotNull] string name)
@@ -755,7 +754,7 @@ namespace VMM.Annotations
     ///     Use this attribute for custom wrappers similar to
     ///     <c>System.Web.WebPages.WebPageBase.RenderSection(String)</c>
     /// </summary>
-    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method, Inherited = true)]
+    [AttributeUsage(AttributeTargets.Parameter | AttributeTargets.Method)]
     public sealed class RazorSectionAttribute : Attribute
     {
     }

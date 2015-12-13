@@ -37,10 +37,7 @@ namespace VMM.Model
         }
 
 
-        public WebClient Client
-        {
-            get { return _client ?? (_client = new WebClient()); }
-        }
+        public WebClient Client => _client ?? (_client = new WebClient());
 
 
         public static Vk Instance { get; }
@@ -157,10 +154,7 @@ namespace VMM.Model
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         #endregion

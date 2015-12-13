@@ -9,7 +9,7 @@ namespace VMM.Helper
     {
         private const string TempPath = "VMM/Cache";
 
-        public static MemoryStream Download(MusicEntry entry)
+        public static Stream Download(MusicEntry entry)
         {
             entry.IsLoading = true;
 
@@ -20,37 +20,37 @@ namespace VMM.Helper
             return stream;
         }
 
-        private static MemoryStream DownloadInternal(MusicEntry entry)
+        private static Stream DownloadInternal(MusicEntry entry)
         {
             byte[] data;
 
-            string cachePath = Path.Combine(Path.GetTempPath(), TempPath);
-            if (!Directory.Exists(cachePath))
+            var cachePath = Path.Combine(Path.GetTempPath(), TempPath);
+            if(!Directory.Exists(cachePath))
             {
                 Directory.CreateDirectory(cachePath);
             }
 
-            string cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
+            var cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
 
-            if (File.Exists(cacheFilePath))
+            if(File.Exists(cacheFilePath))
             {
-                long remoteFileSize = GetRemoteFileSize(entry.Url);
-                long cacheSize = new FileInfo(cacheFilePath).Length;
+                var remoteFileSize = GetRemoteFileSize(entry.Url);
+                var cacheSize = new FileInfo(cacheFilePath).Length;
 
-                if (remoteFileSize == cacheSize)
+                if(remoteFileSize == cacheSize)
                 {
-                    return new MemoryStream(File.ReadAllBytes(cacheFilePath));
+                    return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
                 }
             }
 
-            lock (Vk.Instance.Client)
+            lock(Vk.Instance.Client)
             {
                 try
                 {
                     data = Vk.Instance.Client.DownloadData(entry.Url);
                     File.WriteAllBytes(cacheFilePath, data);
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
                     Trace.WriteLine(e);
                     data = new byte[0];
@@ -62,24 +62,20 @@ namespace VMM.Helper
 
         private static long GetRemoteFileSize(Uri uri)
         {
-            lock (Vk.Instance.Client)
+            lock(Vk.Instance.Client)
             {
                 try
                 {
                     var stream = Vk.Instance.Client.OpenRead(uri);
 
                     var fileSize = long.Parse(Vk.Instance.Client.ResponseHeaders["Content-Length"]);
-
-                    if (stream != null)
-                    {
-                        stream.Close();
-                    }
+                    stream?.Dispose();
 
                     return fileSize;
                 }
-                catch (Exception e)
+                catch(Exception e)
                 {
-                    Trace.WriteLine(String.Format("While getting file size: {0}", e));
+                    Trace.WriteLine($"While getting file size: {e}");
 
                     return 0;
                 }

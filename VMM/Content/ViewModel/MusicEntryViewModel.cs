@@ -2,7 +2,6 @@
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net;
 using System.Runtime.CompilerServices;
 using System.Threading.Tasks;
 using System.Windows;
@@ -42,44 +41,44 @@ namespace VMM.Content.ViewModel
         private void SaveSong(MusicEntry song)
         {
             var dlg = new SaveFileDialog
-                      {
-                          FileName = String.Format("{0}.mp3",
-                              new String(String.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())),
-                          Filter = "Файл mp3|*.mp3"
-                      };
+            {
+                FileName = string.Format("{0}.mp3",
+                    new string(string.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())),
+                Filter = "Файл mp3|*.mp3"
+            };
 
-            if (dlg.ShowDialog(Application.Current.MainWindow) == true)
+            if(dlg.ShowDialog(Application.Current.MainWindow) == true)
             {
                 SavingInProgress = true;
-                Dispatcher disp = Dispatcher.CurrentDispatcher;
+                var disp = Dispatcher.CurrentDispatcher;
 
                 Task.Run(() =>
-                         {
-                             try
-                             {
-                                 WebClient client = Vk.Instance.Client;
-                                 lock (client)
-                                 {
-                                     client.DownloadFile(song.Url, dlg.FileName);
-                                 }
-                             }
-                             catch (Exception e)
-                             {
-                                 Trace.WriteLine(String.Format("While saving file: {0}", e));
-                             }
-                             finally
-                             {
-                                 disp.Invoke(() => { SavingInProgress = false; });
-                             }
-                         });
+                {
+                    try
+                    {
+                        var client = Vk.Instance.Client;
+                        lock(client)
+                        {
+                            client.DownloadFile(song.Url, dlg.FileName);
+                        }
+                    }
+                    catch(Exception e)
+                    {
+                        Trace.WriteLine(string.Format("While saving file: {0}", e));
+                    }
+                    finally
+                    {
+                        disp.Invoke(() => { SavingInProgress = false; });
+                    }
+                });
             }
         }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }

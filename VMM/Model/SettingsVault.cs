@@ -14,11 +14,11 @@ namespace VMM.Model
         {
             try
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.User, null, null))
+                using(var storage = IsolatedStorageFile.GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.User, null, null))
                 {
-                    if (storage.FileExists(StoragePath))
+                    if(storage.FileExists(StoragePath))
                     {
-                        using (IsolatedStorageFileStream stream = storage.OpenFile(StoragePath, FileMode.Open, FileAccess.Read))
+                        using(var stream = storage.OpenFile(StoragePath, FileMode.Open, FileAccess.Read))
                         {
                             var reader = new BinaryFormatter();
 
@@ -26,17 +26,17 @@ namespace VMM.Model
                             {
                                 return (Settings)reader.Deserialize(stream);
                             }
-                            catch (Exception e)
+                            catch(Exception e)
                             {
-                                Trace.WriteLine(String.Format("Unable to deserialize vault {0}. {1}", stream.Name, e));
+                                Trace.WriteLine($"Unable to deserialize vault {stream.Name}. {e}");
                             }
                         }
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Trace.WriteLine(String.Format("Unable to open vault: {0}", e));
+                Trace.WriteLine($"Unable to open vault: {e}");
             }
 
 
@@ -47,9 +47,9 @@ namespace VMM.Model
         {
             try
             {
-                using (IsolatedStorageFile storage = IsolatedStorageFile.GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.User, null, null))
+                using(var storage = IsolatedStorageFile.GetStore(IsolatedStorageScope.Assembly | IsolatedStorageScope.User, null, null))
                 {
-                    using (IsolatedStorageFileStream stream = storage.OpenFile(StoragePath, FileMode.OpenOrCreate, FileAccess.Write))
+                    using(var stream = storage.OpenFile(StoragePath, FileMode.OpenOrCreate, FileAccess.Write))
                     {
                         var reader = new BinaryFormatter();
 
@@ -57,16 +57,16 @@ namespace VMM.Model
                         {
                             reader.Serialize(stream, settings);
                         }
-                        catch (Exception e)
+                        catch(Exception e)
                         {
-                            Trace.WriteLine(String.Format("Unable to serialize vault {0}. {1}", stream.Name, e));
+                            Trace.WriteLine($"Unable to serialize vault {stream.Name}. {e}");
                         }
                     }
                 }
             }
-            catch (Exception e)
+            catch(Exception e)
             {
-                Trace.WriteLine(String.Format("Unable to open vault: {0}", e));
+                Trace.WriteLine($"Unable to open vault: {e}");
             }
         }
     }

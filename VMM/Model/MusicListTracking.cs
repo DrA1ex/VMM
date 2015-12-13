@@ -2,7 +2,8 @@
 {
     public enum ChangeType
     {
-        Deleted, Edited
+        Deleted,
+        Edited
     }
 
     public class MusicListChange
@@ -15,5 +16,4 @@
     {
         public ulong SongId { get; set; }
     }
-
 }

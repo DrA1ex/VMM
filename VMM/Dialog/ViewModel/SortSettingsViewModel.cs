@@ -1,6 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.ObjectModel;
 using System.ComponentModel;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -15,15 +13,20 @@ namespace VMM.Dialog.ViewModel
     {
         private ICommand _addNewSortingPathCommand;
         private ICommand _invertSortDirectionCommand;
-        private ICommand _romoveSortingPathCommand;
+
+        private ObservableCollection<SortingPath> _originalSortingPathColeCollection;
+
+
+        private SortingPath _primarySortingPath;
+        private ICommand _removeSortingPathCommand;
         private ObservableCollection<SortingPath> _selectedPaths;
         private SortingPath _selectedSortingPath;
         private ObservableCollection<SortingPath> _sortingPaths;
 
         public SortSettingsViewModel()
         {
-            IEnumerable<SortingPath> paths = ReflectionHelper.GetStaticProperties(typeof(SortingPath)).OfType<SortingPath>();
-            foreach (SortingPath path in paths)
+            var paths = ReflectionHelper.GetStaticProperties(typeof(SortingPath)).OfType<SortingPath>();
+            foreach(var path in paths)
             {
                 OriginalSortingPathColeCollection.Add(path);
                 SortingPaths.Add(path);
@@ -33,38 +36,27 @@ namespace VMM.Dialog.ViewModel
         }
 
         public ObservableCollection<SortingPath> SortingPaths
-        {
-            get { return _sortingPaths ?? (_sortingPaths = new ObservableCollection<SortingPath>()); }
-        }
+            => _sortingPaths ?? (_sortingPaths = new ObservableCollection<SortingPath>());
 
         public ObservableCollection<SortingPath> SelectedPaths
-        {
-            get { return _selectedPaths ?? (_selectedPaths = new ObservableCollection<SortingPath>()); }
-        }
-
-        private ObservableCollection<SortingPath> _originalSortingPathColeCollection;
+            => _selectedPaths ?? (_selectedPaths = new ObservableCollection<SortingPath>());
 
         public ObservableCollection<SortingPath> OriginalSortingPathColeCollection
-        {
-            get { return _originalSortingPathColeCollection ?? (_originalSortingPathColeCollection = new ObservableCollection<SortingPath>()); }
-        }
-
-
-        private SortingPath _primarySortingPath;
+            => _originalSortingPathColeCollection ?? (_originalSortingPathColeCollection = new ObservableCollection<SortingPath>());
 
         public SortingPath PrimarySortingPath
         {
             get { return _primarySortingPath; }
             set
             {
-                if (_primarySortingPath != null)
+                if(_primarySortingPath != null)
                     SortingPaths.Add(_primarySortingPath);
 
                 _primarySortingPath = value;
                 SortingPaths.Remove(value);
                 SelectedSortingPath = SortingPaths.FirstOrDefault();
 
-                OnPropertyChanged("PrimarySortingPath");
+                OnPropertyChanged(nameof(PrimarySortingPath));
             }
         }
 
@@ -74,39 +66,32 @@ namespace VMM.Dialog.ViewModel
             set
             {
                 _selectedSortingPath = value;
-                OnPropertyChanged("SelectedSortingPath");
+                OnPropertyChanged(nameof(SelectedSortingPath));
             }
         }
 
         public ICommand InvertSortDirectionCommand
-        {
-            get { return _invertSortDirectionCommand ?? (_invertSortDirectionCommand = new DelegateCommand<SortingPath>(InvertSortDirection)); }
-        }
+            => _invertSortDirectionCommand ?? (_invertSortDirectionCommand = new DelegateCommand<SortingPath>(InvertSortDirection));
 
         public ICommand AddNewSortingPathCommand
-        {
-            get { return _addNewSortingPathCommand ?? (_addNewSortingPathCommand = new DelegateCommand<SortingPath>(AddNewSortingPath)); }
-        }
+            => _addNewSortingPathCommand ?? (_addNewSortingPathCommand = new DelegateCommand<SortingPath>(AddNewSortingPath));
 
-        public ICommand RomoveSortingPathCommand
-        {
-            get { return _romoveSortingPathCommand ?? (_romoveSortingPathCommand = new DelegateCommand<SortingPath>(RomoveSortingPath)); }
-        }
+        public ICommand RemoveSortingPathCommand
+            => _removeSortingPathCommand ?? (_removeSortingPathCommand = new DelegateCommand<SortingPath>(RemoveSortingPath));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
-        private void RomoveSortingPath(SortingPath path)
+        private void RemoveSortingPath(SortingPath path)
         {
             SelectedPaths.Remove(path);
             SortingPaths.Add(path);
 
             SelectedSortingPath = path;
-
         }
 
         private void AddNewSortingPath(SortingPath path)
         {
-            if (path != null)
+            if(path != null)
             {
                 SelectedPaths.Add(path);
                 SortingPaths.Remove(path);
@@ -123,11 +108,8 @@ namespace VMM.Dialog.ViewModel
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

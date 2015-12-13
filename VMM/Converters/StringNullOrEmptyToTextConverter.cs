@@ -9,7 +9,7 @@ namespace VMM.Converters
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
             var str = value as string;
-            return String.IsNullOrEmpty(str) ? "n\\a" : str;
+            return string.IsNullOrEmpty(str) ? "n\\a" : str;
         }
 
         public object ConvertBack(object value, Type targetType, object parameter, CultureInfo culture)

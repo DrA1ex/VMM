@@ -9,10 +9,10 @@ namespace VMM.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool invert = parameter as string == "invert";
-            bool flag = (value is bool || value is int || value is long)
-                && System.Convert.ToBoolean(value);
-            if (invert)
+            var invert = parameter as string == "invert";
+            var flag = (value is bool || value is int || value is long)
+                       && System.Convert.ToBoolean(value);
+            if(invert)
             {
                 flag = !flag;
             }

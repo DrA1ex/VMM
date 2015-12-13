@@ -14,50 +14,60 @@
     <Grid>
         <Grid Panel.ZIndex="100500">
             <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
             </Grid.RowDefinitions>
             <Separator BorderThickness="1" BorderBrush="{StaticResource Accent}" VerticalAlignment="Top" />
 
-            <Border Grid.Row="1" Background="#4C000000" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolToVisible}}">
+            <Border Grid.Row="1" Background="#4C000000"
+                    Visibility="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolToVisible}}">
                 <Border Background="{StaticResource WindowBackground}" Height="150" VerticalAlignment="Center">
                     <DockPanel>
-                        <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}" Style="{StaticResource Heading2}"
-                                   HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top" TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis"/>
-                        <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0" 
-                                     Value="{Binding ElementName=MusicList, Path=DataContext.ProgressCurrentValue}" 
-                                     Maximum="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue}" 
+                        <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}"
+                                   Style="{StaticResource Heading2}"
+                                   HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top"
+                                   TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" />
+                        <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0"
+                                     Value="{Binding ElementName=MusicList, Path=DataContext.ProgressCurrentValue}"
+                                     Maximum="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue}"
                                      IsIndeterminate="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue, Converter={StaticResource BoolInverter}}"
-                                     Height="20"/>
+                                     Height="20" />
                     </DockPanel>
                 </Border>
             </Border>
         </Grid>
 
         <Grid Style="{StaticResource ContentRoot}">
-            <Grid Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
+            <Grid
+                Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
                 <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition/>
-                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition />
+                    <RowDefinition Height="Auto" />
                 </Grid.RowDefinitions>
 
-                <control:PlayerControl DataContext="{Binding ElementName=MusicList, Path=DataContext}"/>
-                <view:MusicListView Grid.Row="1" x:Name="MusicList" d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}"/>
+                <control:PlayerControl DataContext="{Binding ElementName=MusicList, Path=DataContext}" />
+                <view:MusicListView Grid.Row="1" x:Name="MusicList"
+                                    d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}" />
 
                 <DockPanel Grid.Row="2" HorizontalAlignment="Center">
                     <DockPanel.Resources>
                         <Style TargetType="{x:Type mui:ModernButton}">
-                            <Setter Property="Margin" Value="5"/>
-                            <Setter Property="EllipseDiameter" Value="24"/>
-                            <Setter Property="IconHeight" Value="14"/>
-                            <Setter Property="IconWidth" Value="14"/>
+                            <Setter Property="Margin" Value="5" />
+                            <Setter Property="EllipseDiameter" Value="24" />
+                            <Setter Property="IconHeight" Value="14" />
+                            <Setter Property="IconWidth" Value="14" />
                         </Style>
                     </DockPanel.Resources>
-                    <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}"/>
-                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}" Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}" 
-                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}" Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}"/>
-                    <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}" Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}" Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}"/>
+                    <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}"
+                                      Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}" />
+                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}"
+                                      Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"
+                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"
+                                      Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}" />
+                    <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}"
+                                      Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}"
+                                      Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}" />
                 </DockPanel>
             </Grid>
 

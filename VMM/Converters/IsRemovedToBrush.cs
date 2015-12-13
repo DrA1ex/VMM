@@ -6,11 +6,11 @@ using System.Windows.Data;
 
 namespace VMM.Converters
 {
-    class IsRemovedToBrush : IValueConverter
+    internal class IsRemovedToBrush : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            bool flag = value is bool && (bool)value;
+            var flag = value is bool && (bool)value;
 
             return !flag ? Brushes.Transparent : Application.Current.MainWindow.FindResource("ButtonTextDisabled");
         }
