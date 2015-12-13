@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
@@ -119,10 +120,18 @@ namespace VMM.Utils
 
             CurrentSong = entry;
 
-            Reader = new Mp3FileReader(CacheHelper.Download(entry));
+            try
+            {
+                Reader = new Mp3FileReader(CacheHelper.Download(entry));
 
-            WaveOut.Init(Reader);
-            Play();
+                WaveOut.Init(Reader);
+                Play();
+            }
+            catch(Exception e)
+            {
+                Trace.WriteLine($"Unable to parse file: {e}");
+                throw;
+            }
         }
 
         public void Stop()
