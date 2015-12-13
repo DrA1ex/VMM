@@ -1,17 +1,27 @@
-using System;
+﻿using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
-using System.Windows;
+using System.Text;
+using System.Threading.Tasks;
 using System.Windows.Data;
 
 namespace VMM.Converters
 {
-    public class BoolToSaveIconConverter : IMultiValueConverter
+    public class OrCompositeConverter : IMultiValueConverter
     {
         public object Convert(object[] values, Type targetType, object parameter, CultureInfo culture)
         {
-            var flag = values.Aggregate(false, (current, value) => current | value is bool && (bool)value);
-            return Application.Current.MainWindow.FindResource(flag ? "WaitIcon" : "DownloadIcon");
+            bool result = false;
+            foreach(var value in values)
+            {
+                if(value is bool)
+                {
+                    result = result || (bool)value;
+                }
+            }
+
+            return result;
         }
 
         public object[] ConvertBack(object value, Type[] targetTypes, object parameter, CultureInfo culture)

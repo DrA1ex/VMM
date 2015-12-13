@@ -6,7 +6,6 @@
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:control="clr-namespace:VMM.Control"
              xmlns:utils="clr-namespace:VMM.Utils"
-             xmlns:view="clr-namespace:VMM.Content.View"
              mc:Ignorable="d"
              d:DesignHeight="82" d:DesignWidth="572">
     <Grid>
@@ -34,17 +33,10 @@
             <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
 
-        <mui:ModernButton Grid.RowSpan="2"
+        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="10" IconWidth="10"
                           Command="{Binding PlaySongCommand}"
-                          CommandParameter="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong}">
-            <mui:ModernButton.IconData>
-                <PriorityBinding>
-                    <Binding Source="{x:Static utils:MusicPlayer.Instance}" Path="CurrentSong.IsPlaying"
-                             Converter="{StaticResource BoolToPlayIcon}" />
-                    <Binding Source="{StaticResource PlayIcon}" />
-                </PriorityBinding>
-            </mui:ModernButton.IconData>
-        </mui:ModernButton>
+                          CommandParameter="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong}"
+                          Style="{StaticResource PlayerPlayingIconStyle}" />
         <mui:ModernButton Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" IconData="{StaticResource PreviousIcon}"
                           Command="{Binding PlayPreviousCommand}" />
         <mui:ModernButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" IconData="{StaticResource NextIcon}"

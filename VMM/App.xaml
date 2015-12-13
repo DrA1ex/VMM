@@ -2,6 +2,8 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:VMM.Converters"
+             xmlns:mui="http://firstfloorsoftware.com/ModernUI"
+             xmlns:utils="clr-namespace:VMM.Utils"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -14,12 +16,11 @@
             <converters:StringNullOrEmptyToVisibleConverter x:Key="StringNullOrEmptyToVisible" />
             <converters:BoolToVisibleConverter x:Key="BoolToVisible" />
             <converters:BooleanInverter x:Key="BoolInverter" />
-            <converters:BoolToSaveIconConverter x:Key="BoolToIcon" />
             <converters:NullToBooleanConverter x:Key="NullToBool" />
             <converters:IsRemovedToBrush x:Key="IsRemovedToBrush" />
             <converters:DescendingToIconDataConverter x:Key="DescendingToIconData" />
             <converters:SortingMethodDescriptionConverter x:Key="SortingMethodDescriptionConverter" />
-            <converters:BoolToPlayIconConverter x:Key="BoolToPlayIcon" />
+            <converters:OrCompositeConverter x:Key="OrCompositeConverter" />
 
             <PathGeometry x:Key="DownloadIcon">F1 M 20,20L 50.25,20L 56,25.75L 56,56L 20,56L 20,20 Z M 52,27.25L 48.75,24L 48,24L 48,37L 28,37L 28,24L 24,24L 24,52L 52,52L 52,27.25 Z M 39,24L 39,34L 44,34L 44,24L 39,24 Z</PathGeometry>
             <PathGeometry x:Key="WaitIcon">F1 M 25,52L 51,52L 51,57L 25,57L 25,52 Z M 35,16L 41,16L 41,36.5L 49,27L 49,36.5L 38,49L 27,36.5L 27,27L 35,36.5L 35,16 Z</PathGeometry>
@@ -35,6 +36,42 @@
             <PathGeometry x:Key="PauseIcon">F1 M 26.9167,23.75L 33.25,23.75L 33.25,52.25L 26.9167,52.25L 26.9167,23.75 Z M 42.75,23.75L 49.0833,23.75L 49.0833,52.25L 42.75,52.25L 42.75,23.75 Z</PathGeometry>
             <PathGeometry x:Key="NextIcon">F1 M 42.3542,38L 26.5208,53.8333L 37.2083,53.8333L 53.8333,38L 37.2083,22.1667L 26.5208,22.1667L 42.3542,38 Z</PathGeometry>
             <PathGeometry x:Key="PreviousIcon">F1 M 33.6458,38L 49.4792,53.8333L 38.7917,53.8333L 22.1667,38L 38.7917,22.1667L 49.4792,22.1667L 33.6458,38 Z</PathGeometry>
+
+            <Style x:Key="EntryPlayingIconStyle" TargetType="mui:ModernButton">
+                <Setter Property="IconData" Value="{StaticResource PlayIcon}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                        <Setter Property="IconData" Value="{StaticResource PauseIcon}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="EntrySaveIconStyle" TargetType="mui:ModernButton">
+                <Setter Property="IconData" Value="{StaticResource WaitIcon}" />
+
+                <Style.Triggers>
+                    <DataTrigger Value="True">
+                        <DataTrigger.Binding>
+                            <MultiBinding Converter="{StaticResource OrCompositeConverter}">
+                                <Binding ElementName="Self" Path="DataContext.SavingInProgress" />
+                                <Binding Path="IsLoading" />
+                            </MultiBinding>
+                        </DataTrigger.Binding>
+                        <Setter Property="IconData" Value="{StaticResource DownloadIcon}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
+
+            <Style x:Key="PlayerPlayingIconStyle" TargetType="mui:ModernButton">
+                <Setter Property="IconData" Value="{StaticResource PlayIcon}" />
+
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.IsPlaying}" Value="True">
+                        <Setter Property="IconData" Value="{StaticResource PauseIcon}" />
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

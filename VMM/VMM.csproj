@@ -93,7 +93,7 @@
     <Compile Include="Control\SeekBar.xaml.cs">
       <DependentUpon>SeekBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\BoolToPlayIconConverter.cs" />
+    <Compile Include="Converters\OrCompositeConverter.cs" />
     <Compile Include="Helper\CacheHelper.cs" />
     <Compile Include="Helper\ColorSerializationHelper.cs" />
     <Compile Include="Pages\Settings.xaml.cs">
@@ -152,7 +152,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Converters\BoolToSaveIconConverter.cs" />
     <Compile Include="Content\ViewModel\LoginInfoViewModel.cs" />
     <Compile Include="Content\ViewModel\LoginViewModel.cs" />
     <Compile Include="Content\ViewModel\MusicEntryViewModel.cs" />
