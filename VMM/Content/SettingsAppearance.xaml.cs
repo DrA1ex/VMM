@@ -13,9 +13,6 @@ namespace VMM.Content
             DataContext = ViewModel;
         }
 
-        public SettingsAppearanceViewModel ViewModel
-        {
-            get { return _viewModel ?? (_viewModel = new SettingsAppearanceViewModel()); }
-        }
+        public SettingsAppearanceViewModel ViewModel => _viewModel ?? (_viewModel = new SettingsAppearanceViewModel());
     }
 }

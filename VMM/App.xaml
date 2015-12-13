@@ -48,7 +48,7 @@
             </Style>
 
             <Style x:Key="EntrySaveIconStyle" TargetType="mui:ModernButton">
-                <Setter Property="IconData" Value="{StaticResource WaitIcon}" />
+                <Setter Property="IconData" Value="{StaticResource DownloadIcon}" />
 
                 <Style.Triggers>
                     <DataTrigger Value="True">
@@ -58,7 +58,7 @@
                                 <Binding Path="IsLoading" />
                             </MultiBinding>
                         </DataTrigger.Binding>
-                        <Setter Property="IconData" Value="{StaticResource DownloadIcon}" />
+                        <Setter Property="IconData" Value="{StaticResource WaitIcon}" />
                     </DataTrigger>
                 </Style.Triggers>
             </Style>

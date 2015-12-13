@@ -14,10 +14,7 @@ namespace VMM.Content.View
             Loaded += ControlLoaded;
         }
 
-        public MusicEntryViewModel Model
-        {
-            get { return _model ?? (_model = new MusicEntryViewModel()); }
-        }
+        public MusicEntryViewModel Model => _model ?? (_model = new MusicEntryViewModel());
 
         private void ControlLoaded(object sender, RoutedEventArgs e)
         {

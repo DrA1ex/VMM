@@ -20,10 +20,7 @@ namespace VMM.Content.ViewModel
 
         private ICommand _retryCommand;
 
-        public ICommand ChangeAccountCommand
-        {
-            get { return _changeAccountCommand ?? (_changeAccountCommand = new DelegateCommand(ChangeAccount)); }
-        }
+        public ICommand ChangeAccountCommand => _changeAccountCommand ?? (_changeAccountCommand = new DelegateCommand(ChangeAccount));
 
         public bool IsBusy
         {
@@ -35,10 +32,7 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        public ICommand RetryCommand
-        {
-            get { return _retryCommand ?? (_retryCommand = new DelegateCommand(Retry)); }
-        }
+        public ICommand RetryCommand => _retryCommand ?? (_retryCommand = new DelegateCommand(Retry));
 
         public event PropertyChangedEventHandler PropertyChanged;
 

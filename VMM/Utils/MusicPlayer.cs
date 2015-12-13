@@ -35,7 +35,7 @@ namespace VMM.Utils
         public static MusicPlayer Instance { get; private set; }
 
         private WaveOut WaveOut { get; }
-        private Mp3FileReader Reader { get; set; }
+        private Mp3FileReaderEx Reader { get; set; }
 
         public DispatcherTimer SeekTimer => _seekTimer ?? (_seekTimer = new DispatcherTimer());
 
@@ -122,7 +122,7 @@ namespace VMM.Utils
 
             try
             {
-                Reader = new Mp3FileReader(CacheHelper.Download(entry));
+                Reader = new Mp3FileReaderEx(CacheHelper.Download(entry));
 
                 WaveOut.Init(Reader);
                 Play();

@@ -94,8 +94,14 @@
       <DependentUpon>SeekBar.xaml</DependentUpon>
     </Compile>
     <Compile Include="Converters\OrCompositeConverter.cs" />
+    <Compile Include="Helper\Mp3FileReaderEx.cs" />
+    <Compile Include="Helper\ReadFullyStream.cs" />
+    <Compile Include="Helper\TimedOutWebClient.cs">
+      <SubType>Component</SubType>
+    </Compile>
     <Compile Include="Helper\CacheHelper.cs" />
     <Compile Include="Helper\ColorSerializationHelper.cs" />
+    <Compile Include="Helper\SeekableStream.cs" />
     <Compile Include="Pages\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>

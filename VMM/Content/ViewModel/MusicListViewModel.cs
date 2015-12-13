@@ -51,15 +51,9 @@ namespace VMM.Content.ViewModel
         }
 
 
-        public ICommand RefreshCommand
-        {
-            get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(Refresh)); }
-        }
+        public ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new DelegateCommand(Refresh));
 
-        public ObservableCollection<MusicEntry> Music
-        {
-            get { return _music ?? (_music = new ObservableCollection<MusicEntry>()); }
-        }
+        public ObservableCollection<MusicEntry> Music => _music ?? (_music = new ObservableCollection<MusicEntry>());
 
         public bool IsBusy
         {
@@ -71,10 +65,7 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        public bool CanEdit
-        {
-            get { return !_isReadOnly; }
-        }
+        public bool CanEdit => !_isReadOnly;
 
         public string BusyText
         {
@@ -119,10 +110,7 @@ namespace VMM.Content.ViewModel
 
         public MusicEntry[] SelectedItems { get; set; }
 
-        public List<MusicListChange> ChangesList
-        {
-            get { return _changesList ?? (_changesList = new List<MusicListChange>()); }
-        }
+        public List<MusicListChange> ChangesList => _changesList ?? (_changesList = new List<MusicListChange>());
 
         public MusicEntry SelectedSong
         {
@@ -134,45 +122,21 @@ namespace VMM.Content.ViewModel
             }
         }
 
-        public ICommand RemoveCommand
-        {
-            get { return _removeCommand ?? (_removeCommand = new DelegateCommand<MusicEntry>(Remove)); }
-        }
+        public ICommand RemoveCommand => _removeCommand ?? (_removeCommand = new DelegateCommand<MusicEntry>(Remove));
 
-        public ICommand SortCommand
-        {
-            get { return _sortCommand ?? (_sortCommand = new DelegateCommand<MusicEntry[]>(Sort)); }
-        }
+        public ICommand SortCommand => _sortCommand ?? (_sortCommand = new DelegateCommand<MusicEntry[]>(Sort));
 
-        public ICommand SaveChangesCommand
-        {
-            get { return _saveChangesCommand ?? (_saveChangesCommand = new DelegateCommand(SaveChanges)); }
-        }
+        public ICommand SaveChangesCommand => _saveChangesCommand ?? (_saveChangesCommand = new DelegateCommand(SaveChanges));
 
-        public ICommand RemoveSelectedCommand
-        {
-            get { return _removeSelectedCommand ?? (_removeSelectedCommand = new DelegateCommand<MusicEntry[]>(RemoveSelected)); }
-        }
+        public ICommand RemoveSelectedCommand => _removeSelectedCommand ?? (_removeSelectedCommand = new DelegateCommand<MusicEntry[]>(RemoveSelected));
 
-        public ICommand SaveSelectedCommand
-        {
-            get { return _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected)); }
-        }
+        public ICommand SaveSelectedCommand => _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected));
 
-        public ICommand PlaySongCommand
-        {
-            get { return _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlaySong)); }
-        }
+        public ICommand PlaySongCommand => _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlaySong));
 
-        public ICommand PlayNextCommand
-        {
-            get { return _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext)); }
-        }
+        public ICommand PlayNextCommand => _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext));
 
-        public ICommand PlayPreviousCommand
-        {
-            get { return _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious)); }
-        }
+        public ICommand PlayPreviousCommand => _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious));
 
         public event PropertyChangedEventHandler PropertyChanged;
 

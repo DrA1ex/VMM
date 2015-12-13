@@ -20,10 +20,7 @@ namespace VMM.Content.ViewModel
 
         private bool _savingInProgress;
 
-        public ICommand SaveSongCommand
-        {
-            get { return _saveSongCommand ?? (_saveSongCommand = new DelegateCommand<MusicEntry>(SaveSong)); }
-        }
+        public ICommand SaveSongCommand => _saveSongCommand ?? (_saveSongCommand = new DelegateCommand<MusicEntry>(SaveSong));
 
         public bool SavingInProgress
         {

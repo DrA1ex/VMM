@@ -19,10 +19,7 @@ namespace VMM.Content.View
             DataContext = Model;
         }
 
-        public LoginViewModel Model
-        {
-            get { return _model ?? (_model = new LoginViewModel()); }
-        }
+        public LoginViewModel Model => _model ?? (_model = new LoginViewModel());
 
         private string GetPasswordMethod()
         {

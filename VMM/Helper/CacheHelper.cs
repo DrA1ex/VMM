@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Threading;
+using System.Threading.Tasks;
 using VMM.Model;
 
 namespace VMM.Helper
@@ -9,15 +12,12 @@ namespace VMM.Helper
     {
         private const string TempPath = "VMM/Cache";
 
+        private static readonly WebClient CacheWebClient = new WebClient();
+        private static readonly WebClient SizeRetrievingClient = new TimedOutWebClient(TimeSpan.FromSeconds(5));
+
         public static Stream Download(MusicEntry entry)
         {
-            entry.IsLoading = true;
-
-            var stream = DownloadInternal(entry);
-
-            entry.IsLoading = false;
-
-            return stream;
+            return DownloadInternal(entry);
         }
 
         private static Stream DownloadInternal(MusicEntry entry)
@@ -31,44 +31,61 @@ namespace VMM.Helper
             }
 
             var cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
+            var remoteFileSize = GetRemoteFileSize(entry.Url);
 
             if(File.Exists(cacheFilePath))
             {
-                var remoteFileSize = GetRemoteFileSize(entry.Url);
-                var cacheSize = new FileInfo(cacheFilePath).Length;
+                entry.IsLoading = true;
 
-                if(remoteFileSize == cacheSize)
+                try
                 {
-                    return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
+                    var cacheSize = new FileInfo(cacheFilePath).Length;
+                    if(remoteFileSize == cacheSize)
+                    {
+                        return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
+                    }
+                }
+                finally
+                {
+                    entry.IsLoading = false;
                 }
             }
 
-            lock(Vk.Instance.Client)
+            Task.Run(async () =>
             {
                 try
                 {
-                    data = Vk.Instance.Client.DownloadData(entry.Url);
+                    Monitor.Enter(CacheWebClient);
+
+                    entry.IsLoading = true;
+
+                    data = await CacheWebClient.DownloadDataTaskAsync(entry.Url);
                     File.WriteAllBytes(cacheFilePath, data);
                 }
                 catch(Exception e)
                 {
-                    Trace.WriteLine(e);
-                    data = new byte[0];
+                    Trace.WriteLine($"Unable to cache file: {e}");
                 }
-            }
+                finally
+                {
+                    entry.IsLoading = false;
+                    Monitor.Exit(CacheWebClient);
+                }
+            });
 
-            return new MemoryStream(data);
+
+            return new SeekableStream(new WebClient().OpenRead(entry.Url), remoteFileSize);
         }
 
         private static long GetRemoteFileSize(Uri uri)
         {
-            lock(Vk.Instance.Client)
+            lock(SizeRetrievingClient)
             {
                 try
                 {
-                    var stream = Vk.Instance.Client.OpenRead(uri);
+                    var stream = SizeRetrievingClient.OpenRead(uri);
 
-                    var fileSize = long.Parse(Vk.Instance.Client.ResponseHeaders["Content-Length"]);
+                    var fileSize = long.Parse(SizeRetrievingClient.ResponseHeaders["Content-Length"]);
                     stream?.Dispose();
 
                     return fileSize;

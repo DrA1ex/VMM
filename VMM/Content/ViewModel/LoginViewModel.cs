@@ -19,10 +19,7 @@ namespace VMM.Content.ViewModel
         public Action AuthorizationSuccess = () => { };
         public Func<string> GetPasswordMethod = () => null;
 
-        public ICommand LoginCommand
-        {
-            get { return _loginCommand ?? (_loginCommand = new DelegateCommand(Login)); }
-        }
+        public ICommand LoginCommand => _loginCommand ?? (_loginCommand = new DelegateCommand(Login));
 
         public string Email { get; set; }
 

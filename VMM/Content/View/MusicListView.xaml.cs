@@ -32,10 +32,7 @@ namespace VMM.Content.View
         }
 
 
-        public MusicListViewModel Model
-        {
-            get { return _model ?? (_model = new MusicListViewModel()); }
-        }
+        public MusicListViewModel Model => _model ?? (_model = new MusicListViewModel());
 
         public MusicEntry[] SelectedItems
         {
