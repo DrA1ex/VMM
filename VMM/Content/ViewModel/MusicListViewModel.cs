@@ -61,7 +61,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _isBusy = value;
-                OnPropertyChanged("IsBusy");
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
 
@@ -73,7 +73,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _busyText = value;
-                OnPropertyChanged("BusyText");
+                OnPropertyChanged(nameof(BusyText));
             }
         }
 
@@ -83,7 +83,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _progressMaxValue = value;
-                OnPropertyChanged("ProgressMaxValue");
+                OnPropertyChanged(nameof(ProgressMaxValue));
             }
         }
 
@@ -93,7 +93,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _progressCurrentValue = value;
-                OnPropertyChanged("ProgressCurrentValue");
+                OnPropertyChanged(nameof(ProgressCurrentValue));
             }
         }
 
@@ -104,7 +104,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _isModified = value;
-                OnPropertyChanged("IsModified");
+                OnPropertyChanged(nameof(IsModified));
             }
         }
 
@@ -118,7 +118,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _selectedSong = value;
-                OnPropertyChanged("SelectedSong");
+                OnPropertyChanged(nameof(SelectedSong));
             }
         }
 
@@ -156,7 +156,7 @@ namespace VMM.Content.ViewModel
             }
 
             IsBusy = true;
-            var disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, выполняется сохранение выбранных песен...";
             ProgressMaxValue = musicEntries.Length;
@@ -172,8 +172,7 @@ namespace VMM.Content.ViewModel
 
                     foreach(var song in musicEntries)
                     {
-                        var fileName = string.Format("{0}.mp3",
-                            new string(string.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray()));
+                        var fileName = $"{new string($"{song.Artist} - {song.Name}".Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())}.mp3";
 
                         var filePath = Path.Combine(savePath, fileName);
                         if(!File.Exists(filePath))
@@ -184,18 +183,18 @@ namespace VMM.Content.ViewModel
                             }
                         }
 
-                        disp.Invoke(() => { ++ProgressCurrentValue; });
+                        uiDispatcher.Invoke(() => { ++ProgressCurrentValue; });
                     }
                 }
                 catch(Exception e)
                 {
-                    Trace.WriteLine(string.Format("While saving file: {0}", e));
+                    Trace.WriteLine($"While saving file: {e}");
 
-                    disp.Invoke(() => { ModernDialog.ShowMessage("Во время сохранения произошла ошибка :(", "Не удалось сохранить файл", MessageBoxButton.OK); });
+                    uiDispatcher.Invoke(() => { ModernDialog.ShowMessage("Во время сохранения произошла ошибка :(", "Не удалось сохранить файл", MessageBoxButton.OK); });
                 }
                 finally
                 {
-                    disp.Invoke(() => { IsBusy = false; });
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
                 }
             });
         }
@@ -215,7 +214,7 @@ namespace VMM.Content.ViewModel
             ChangesList.Clear();
             IsModified = false;
 
-            var disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, обновляется список музыки...";
             ProgressMaxValue = 0;
@@ -247,12 +246,12 @@ namespace VMM.Content.ViewModel
                             entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
                         }
 
-                        disp.BeginInvoke(new Action(() => Music.Add(entry)));
+                        uiDispatcher.BeginInvoke(new Action(() => Music.Add(entry)));
                     }
                 }
                 finally
                 {
-                    disp.Invoke(() => { IsBusy = false; });
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
                 }
             });
         }
@@ -297,7 +296,7 @@ namespace VMM.Content.ViewModel
             Music.Clear();
 
             IsBusy = true;
-            var disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, выполняется сортировка...";
             ProgressMaxValue = 0;
@@ -316,10 +315,10 @@ namespace VMM.Content.ViewModel
                 foreach(var musicEntry in musicEntries)
                 {
                     var entry = musicEntry;
-                    disp.BeginInvoke(new Action(() => Music.Add(entry)));
+                    uiDispatcher.BeginInvoke(new Action(() => Music.Add(entry)));
                 }
 
-                disp.Invoke(() => { IsBusy = false; });
+                uiDispatcher.Invoke(() => { IsBusy = false; });
             });
 
             IsModified = true;
@@ -328,7 +327,7 @@ namespace VMM.Content.ViewModel
         private void SaveChanges()
         {
             IsBusy = true;
-            var disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, применяются изменения...";
             ProgressMaxValue = Music.Count + ChangesList.Count - 1;
@@ -342,12 +341,12 @@ namespace VMM.Content.ViewModel
                     for(var i = 0; i < Music.Count; i++)
                     {
                         var entry = Music[i];
-                        var previosId = i != 0 ? Music[i - 1].Id : 0;
+                        var previousId = i != 0 ? Music[i - 1].Id : 0;
                         var nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
 
-                        Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previosId, (long)nextId);
+                        Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previousId, (long)nextId);
 
-                        disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+                        uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 
                         Thread.Sleep(340); //Allowed only 3 request per second
                     }
@@ -356,15 +355,15 @@ namespace VMM.Content.ViewModel
                     {
                         Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
 
-                        disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+                        uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 
                         Thread.Sleep(340);
                     }
                 }
                 finally
                 {
-                    disp.Invoke(() => { IsBusy = false; });
-                    disp.BeginInvoke(new Action(Refresh));
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
+                    uiDispatcher.BeginInvoke(new Action(Refresh));
                 }
             });
         }
@@ -449,10 +448,7 @@ namespace VMM.Content.ViewModel
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
             var handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void MoveSong(int srcIndex, int targetIndex)
