@@ -3,7 +3,6 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
-using System.Threading.Tasks;
 using VMM.Model;
 
 namespace VMM.Helper
@@ -11,9 +10,13 @@ namespace VMM.Helper
     public static class CacheHelper
     {
         private const string TempPath = "VMM/Cache";
+        private const int DefaultStreamReadBufferSize = 128 * 1024;
 
         private static readonly WebClient CacheWebClient = new WebClient();
         private static readonly WebClient SizeRetrievingClient = new TimedOutWebClient(TimeSpan.FromSeconds(5));
+        private static readonly WebClient PlayClient = new WebClient();
+
+        private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
 
         public static Stream Download(MusicEntry entry)
         {
@@ -51,12 +54,10 @@ namespace VMM.Helper
                 }
             }
 
-            Task.Run(async () =>
+            CachingSyncSemaphore.WaitAsync().ContinueWith(async o =>
             {
                 try
                 {
-                    Monitor.Enter(CacheWebClient);
-
                     entry.IsLoading = true;
 
                     data = await CacheWebClient.DownloadDataTaskAsync(entry.Url);
@@ -69,12 +70,11 @@ namespace VMM.Helper
                 finally
                 {
                     entry.IsLoading = false;
-                    Monitor.Exit(CacheWebClient);
+                    CachingSyncSemaphore.Release();
                 }
             });
 
-
-            return new SeekableStream(new WebClient().OpenRead(entry.Url), remoteFileSize);
+            return new BufferedStream(new SeekableStream(PlayClient.OpenRead(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
         }
 
         private static long GetRemoteFileSize(Uri uri)

@@ -122,7 +122,7 @@ namespace VMM.Utils
 
             try
             {
-                Reader = new Mp3FileReaderEx(CacheHelper.Download(entry));
+                Reader = new Mp3FileReaderEx(CacheHelper.Download(entry), entry.Duration);
 
                 WaveOut.Init(Reader);
                 Play();
