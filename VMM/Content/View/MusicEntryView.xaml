@@ -54,9 +54,9 @@
         <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
                    Foreground="{DynamicResource ButtonText}" />
         <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
-            <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
+            <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ItemText}" />
             <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
-                       Foreground="{DynamicResource ModernButtonBorder}" />
+                       Foreground="{DynamicResource ItemText}" />
         </DockPanel>
         <DockPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
             <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3"

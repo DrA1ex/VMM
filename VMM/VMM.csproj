@@ -114,7 +114,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Page Include="Assets\ModernUI.Love.xaml">
+    <Page Include="Assets\ModernUI.Earth.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
@@ -226,9 +226,9 @@
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Assets\background.kitty.png" />
-    <Content Include="Assets\background.love.jpg" />
-    <Content Include="Assets\background.snowflakes.jpg" />
+    <Resource Include="Assets\background.kitty.png" />
+    <Resource Include="Assets\background.snowflakes.jpg" />
+    <Resource Include="Assets\background.earth.jpg" />
     <Content Include="Icon.ico" />
   </ItemGroup>
   <ItemGroup />

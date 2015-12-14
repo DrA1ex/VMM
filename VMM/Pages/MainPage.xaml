@@ -19,7 +19,7 @@
             </Grid.RowDefinitions>
             <Separator BorderThickness="1" BorderBrush="{DynamicResource Accent}" VerticalAlignment="Top" />
 
-            <Border Grid.Row="1" Background="#4C000000"
+            <Border Grid.Row="1" Background="#01FFFFFF"
                     Visibility="{Binding ElementName=MusicList, Path=DataContext.IsBusy, Converter={StaticResource BoolToVisible}}">
                 <Border Background="{DynamicResource WindowBackground}" Height="150" VerticalAlignment="Center">
                     <DockPanel>
@@ -38,7 +38,7 @@
         </Grid>
 
         <Grid Style="{StaticResource ContentRoot}">
-            <Grid
+            <Grid Style="{StaticResource BusyBlurEffectStyle}"
                 Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />

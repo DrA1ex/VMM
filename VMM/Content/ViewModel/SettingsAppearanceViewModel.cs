@@ -27,10 +27,10 @@ namespace VMM.Content.ViewModel
             _themes.Add(new Link { DisplayName = "Светлая", Source = AppearanceManager.LightThemeSource });
 
             // add additional themes
-            _themes.Add(new Link { DisplayName = "Бинг", Source = new Uri("/DocumentDb;component/Assets/ModernUI.BingImage.xaml", UriKind.Relative) });
-            _themes.Add(new Link { DisplayName = "Hello Kitty", Source = new Uri("/DocumentDb;component/Assets/ModernUI.HelloKitty.xaml", UriKind.Relative) });
-            _themes.Add(new Link { DisplayName = "Любовь", Source = new Uri("/DocumentDb;component/Assets/ModernUI.Love.xaml", UriKind.Relative) });
-            _themes.Add(new Link { DisplayName = "Снежинки", Source = new Uri("/DocumentDb;component/Assets/ModernUI.Snowflakes.xaml", UriKind.Relative) });
+            _themes.Add(new Link { DisplayName = "Бинг", Source = new Uri("/VMM;component/Assets/ModernUI.BingImage.xaml", UriKind.Relative) });
+            _themes.Add(new Link { DisplayName = "Hello Kitty", Source = new Uri("/VMM;component/Assets/ModernUI.HelloKitty.xaml", UriKind.Relative) });
+            _themes.Add(new Link { DisplayName = "Земля", Source = new Uri("/VMM;component/Assets/ModernUI.Earth.xaml", UriKind.Relative) });
+            _themes.Add(new Link { DisplayName = "Снежинки", Source = new Uri("/VMM;component/Assets/ModernUI.Snowflakes.xaml", UriKind.Relative) });
 
             LoadSettings();
 

@@ -5,10 +5,12 @@
         <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Color x:Key="AccentColor">#1BA1E2</Color>
+    
     <!-- background image taken from http://good-wallpapers.com/ -->
     <Rectangle x:Key="WindowBackgroundContent" x:Shared="false">
         <Rectangle.Fill>
-            <ImageBrush Opacity=".2" ImageSource="/Assets/background.snowflakes.jpg" Stretch="UniformToFill" />
+            <ImageBrush Opacity=".1" ImageSource="/Assets/background.snowflakes.jpg" Stretch="UniformToFill" />
         </Rectangle.Fill>
     </Rectangle>
 

@@ -74,7 +74,12 @@ namespace VMM.Helper
                 }
             });
 
-            return new BufferedStream(new SeekableStream(PlayClient.OpenRead(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
+            if(remoteFileSize > 0)
+            {
+                return new BufferedStream(new SeekableStream(PlayClient.OpenRead(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
+            }
+
+            return Stream.Null;
         }
 
         private static long GetRemoteFileSize(Uri uri)

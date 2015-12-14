@@ -72,6 +72,18 @@
                     </DataTrigger>
                 </Style.Triggers>
             </Style>
+
+            <Style x:Key="BusyBlurEffectStyle" TargetType="Grid">
+                <Style.Triggers>
+                    <DataTrigger Binding="{Binding ElementName=MusicList, Path=DataContext.IsBusy}" Value="True">
+                        <Setter Property="Effect">
+                            <Setter.Value>
+                                <BlurEffect Radius="5" KernelType="Gaussian" x:Name="BusyBlurEffect"/>
+                            </Setter.Value>
+                        </Setter>
+                    </DataTrigger>
+                </Style.Triggers>
+            </Style>
         </ResourceDictionary>
     </Application.Resources>
 </Application>

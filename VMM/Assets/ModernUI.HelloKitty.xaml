@@ -5,11 +5,12 @@
         <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml" />
     </ResourceDictionary.MergedDictionaries>
 
+    <Color x:Key="AccentColor">#f472d0</Color>
+    
     <Rectangle x:Key="WindowBackgroundContent" x:Shared="false" Margin="32">
         <Rectangle.Fill>
             <ImageBrush Opacity=".1" ImageSource="/Assets/background.kitty.png" Stretch="None" AlignmentX="Right"
                         AlignmentY="Bottom" />
         </Rectangle.Fill>
     </Rectangle>
-
 </ResourceDictionary>
