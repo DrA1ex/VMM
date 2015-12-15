@@ -13,7 +13,7 @@ using NAudio.Wave;
 
 //TODO: Need to refactor
 
-namespace VMM.Helper
+namespace VMM.Player.Reader
 {
     internal class Mp3IndexedFrame
     {

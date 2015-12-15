@@ -3,7 +3,7 @@ using System.Windows.Media;
 using FirstFloor.ModernUI.Presentation;
 using VMM.Helper;
 using VMM.Model;
-using VMM.Utils;
+using VMM.Player;
 
 namespace VMM
 {

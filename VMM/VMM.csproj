@@ -95,14 +95,14 @@
     </Compile>
     <Compile Include="Converters\OrCompositeConverter.cs" />
     <Compile Include="Helper\TaskHelper.cs" />
-    <Compile Include="Helper\Mp3FileReaderEx.cs" />
-    <Compile Include="Helper\CacheHelper.cs" />
+    <Compile Include="Player\Reader\Mp3FileReaderEx.cs" />
+    <Compile Include="Player\Helper\CacheHelper.cs" />
     <Compile Include="Helper\ColorSerializationHelper.cs" />
-    <Compile Include="Helper\SeekableStream.cs" />
+    <Compile Include="Player\DataProvider\SeekableStream.cs" />
     <Compile Include="Pages\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Utils\MusicPlayer.cs" />
+    <Compile Include="Player\MusicPlayer.cs" />
     <Page Include="Assets\ModernUI.BingImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>

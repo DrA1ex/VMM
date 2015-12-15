@@ -5,7 +5,7 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:control="clr-namespace:VMM.Control"
-             xmlns:utils="clr-namespace:VMM.Utils"
+             xmlns:utils="clr-namespace:VMM.Player"
              mc:Ignorable="d"
              d:DesignHeight="82" d:DesignWidth="572">
     <Grid>

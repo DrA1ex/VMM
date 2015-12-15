@@ -3,7 +3,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:converters="clr-namespace:VMM.Converters"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
-             xmlns:utils="clr-namespace:VMM.Utils"
+             xmlns:utils="clr-namespace:VMM.Player"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>

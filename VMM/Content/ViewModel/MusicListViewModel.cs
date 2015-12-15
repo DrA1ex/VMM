@@ -17,7 +17,7 @@ using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
 using VMM.Model;
-using VMM.Utils;
+using VMM.Player;
 using Application = System.Windows.Application;
 
 namespace VMM.Content.ViewModel

@@ -4,9 +4,11 @@ using System.IO;
 using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
+using VMM.Helper;
 using VMM.Model;
+using VMM.Player.DataProvider;
 
-namespace VMM.Helper
+namespace VMM.Player.Helper
 {
     public static class CacheHelper
     {

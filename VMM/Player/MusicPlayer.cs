@@ -7,10 +7,11 @@ using System.Threading.Tasks;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using NAudio.Wave;
-using VMM.Helper;
 using VMM.Model;
+using VMM.Player.Helper;
+using VMM.Player.Reader;
 
-namespace VMM.Utils
+namespace VMM.Player
 {
     public class MusicPlayer : IDisposable, INotifyPropertyChanged
     {
@@ -40,11 +41,13 @@ namespace VMM.Utils
 
         public DispatcherTimer SeekTimer => _seekTimer ?? (_seekTimer = new DispatcherTimer());
 
+#pragma warning disable 612
         public double Volume
         {
             get { return WaveOut.Volume; }
             set { WaveOut.Volume = (float)value; }
         }
+#pragma warning restore 612
 
         public double Seek
         {
@@ -125,6 +128,8 @@ namespace VMM.Utils
 
             try
             {
+                CurrentSong.IsPlaying = true;
+
                 var stream = await CacheHelper.Download(entry);
 
                 Reader = new Mp3FileReaderEx(stream, entry.Duration);
@@ -179,7 +184,6 @@ namespace VMM.Utils
         private void Play()
         {
             WaveOut.Play();
-            CurrentSong.IsPlaying = true;
 
             SeekTimer.Start();
             OnPropertyChanged(nameof(Seek));
