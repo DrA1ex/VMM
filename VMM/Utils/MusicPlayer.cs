@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
 using System.Windows.Threading;
 using JetBrains.Annotations;
 using NAudio.Wave;
@@ -24,7 +25,7 @@ namespace VMM.Utils
 
         private MusicPlayer()
         {
-            WaveOut = new WaveOut();
+            WaveOut = new WaveOutEvent();
             WaveOut.PlaybackStopped += OnPlaybackStopped;
 
             SeekTimer.Interval = TimeSpan.FromSeconds(0.33);
@@ -34,7 +35,7 @@ namespace VMM.Utils
 
         public static MusicPlayer Instance { get; private set; }
 
-        private WaveOut WaveOut { get; }
+        private WaveOutEvent WaveOut { get; }
         private Mp3FileReaderEx Reader { get; set; }
 
         public DispatcherTimer SeekTimer => _seekTimer ?? (_seekTimer = new DispatcherTimer());
@@ -48,7 +49,7 @@ namespace VMM.Utils
         public double Seek
         {
             get { return Reader != null && WaveOut.PlaybackState != PlaybackState.Stopped ? (double)Reader.Position / Reader.Length : 0.0; }
-            set { Reader?.Seek((long)(value * Reader.Length), SeekOrigin.Begin); }
+            set { Task.Run(() => Reader?.Seek((long)(value * Reader.Length), SeekOrigin.Begin)); }
         }
 
         public MusicEntry CurrentSong
@@ -95,7 +96,7 @@ namespace VMM.Utils
             handler?.Invoke(this, stoppedEventArgs);
         }
 
-        public void Play(MusicEntry entry)
+        public async Task Play(MusicEntry entry)
         {
             if(CurrentSong == entry)
             {
@@ -120,12 +121,24 @@ namespace VMM.Utils
 
             CurrentSong = entry;
 
+            var dispatcher = Dispatcher.CurrentDispatcher;
+
             try
             {
-                Reader = new Mp3FileReaderEx(CacheHelper.Download(entry), entry.Duration);
+                var stream = await CacheHelper.Download(entry);
 
-                WaveOut.Init(Reader);
-                Play();
+                Reader = new Mp3FileReaderEx(stream, entry.Duration);
+
+                dispatcher.Invoke(() =>
+                {
+                    WaveOut.Stop();
+                    WaveOut.Init(Reader);
+                    Play();
+                });
+            }
+            catch(OperationCanceledException)
+            {
+                //ignore
             }
             catch(Exception e)
             {

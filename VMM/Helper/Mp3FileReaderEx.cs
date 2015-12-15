@@ -377,6 +377,11 @@ namespace VMM.Helper
         /// </summary>
         public override int Read(byte[] sampleBuffer, int offset, int numBytes)
         {
+            if(_decompressor == null)
+            {
+                return 0; //Disposed
+            }
+
             var bytesRead = 0;
             lock(_repositionLock)
             {

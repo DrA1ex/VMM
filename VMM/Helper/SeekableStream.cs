@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Threading;
 
 namespace VMM.Helper
 {
@@ -7,9 +8,11 @@ namespace VMM.Helper
     {
         public SeekableStream(Stream stream, long length)
         {
-            Stream = new ReadFullyStream(stream);
+            Stream = stream;
             InternalBuffer = new byte[length];
         }
+
+        private CancellationTokenSource ReadCancellationSource { get; } = new CancellationTokenSource();
 
         private Stream Stream { get; }
         private byte[] InternalBuffer { get; }
@@ -73,8 +76,20 @@ namespace VMM.Helper
         {
             if(BufferedBytes < InternalPosition + count)
             {
-                var bytesToRead = Math.Min(InternalPosition - BufferedBytes + count, InternalBuffer.Length - BufferedBytes);
-                BufferedBytes += Stream.Read(InternalBuffer, (int)BufferedBytes, (int)bytesToRead);
+                var needToRead = Math.Min(InternalPosition - BufferedBytes + count, InternalBuffer.Length - BufferedBytes);
+                try
+                {
+                    while(needToRead > 0)
+                    {
+                        var readed = Stream.ReadAsync(InternalBuffer, (int)BufferedBytes, (int)needToRead, ReadCancellationSource.Token).Result;
+                        BufferedBytes += readed;
+                        needToRead -= readed;
+                    }
+                }
+                catch(Exception)
+                {
+                    return 0;
+                }
             }
 
             var canRead = Math.Min(InternalBuffer.Length - InternalPosition, count);
@@ -88,6 +103,14 @@ namespace VMM.Helper
         public override void Write(byte[] buffer, int offset, int count)
         {
             throw new NotSupportedException();
+        }
+
+        protected override void Dispose(bool disposing)
+        {
+            ReadCancellationSource.Cancel(true);
+            ReadCancellationSource.Dispose();
+
+            base.Dispose(disposing);
         }
     }
 }

@@ -24,12 +24,11 @@ namespace VMM.Content.ViewModel
 {
     public class MusicListViewModel : INotifyPropertyChanged
     {
+        private readonly bool _isReadOnly;
         private string _busyText;
         private List<MusicListChange> _changesList;
         private bool _isBusy;
         private bool _isModified;
-
-        private readonly bool _isReadOnly;
         private ObservableCollection<MusicEntry> _music;
         private ICommand _playNextCommand;
         private ICommand _playPreviousCommand;
@@ -381,17 +380,13 @@ namespace VMM.Content.ViewModel
 
             if(musicEntry != null)
             {
-                Task.Run(() =>
+                MusicPlayer.Instance.Play(musicEntry).ContinueWith(t =>
                 {
-                    lock(MusicPlayer.Instance)
-                        try
-                        {
-                            MusicPlayer.Instance.Play(musicEntry);
-                        }
-                        catch(Exception)
-                        {
-                            dispatcher.InvokeAsync(PlayNext);
-                        }
+                    if(t.IsFaulted)
+                    {
+                        t.Exception?.Handle((e) => true);
+                        dispatcher.InvokeAsync(PlayNext);
+                    }
                 });
             }
         }

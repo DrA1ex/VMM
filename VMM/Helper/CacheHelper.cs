@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
+using System.Threading.Tasks;
 using VMM.Model;
 
 namespace VMM.Helper
@@ -13,17 +14,20 @@ namespace VMM.Helper
         private const int DefaultStreamReadBufferSize = 128 * 1024;
 
         private static readonly WebClient CacheWebClient = new WebClient();
-        private static readonly WebClient SizeRetrievingClient = new TimedOutWebClient(TimeSpan.FromSeconds(5));
         private static readonly WebClient PlayClient = new WebClient();
 
         private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
 
-        public static Stream Download(MusicEntry entry)
+        private static HttpWebRequest _sizeRetrievingRequest;
+
+        private static readonly int SizeRetrievingTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
+
+        public static Task<Stream> Download(MusicEntry entry)
         {
             return DownloadInternal(entry);
         }
 
-        private static Stream DownloadInternal(MusicEntry entry)
+        private static async Task<Stream> DownloadInternal(MusicEntry entry)
         {
             byte[] data;
 
@@ -34,7 +38,7 @@ namespace VMM.Helper
             }
 
             var cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
-            var remoteFileSize = GetRemoteFileSize(entry.Url);
+            var remoteFileSize = await GetRemoteFileSize(entry.Url);
 
             if(File.Exists(cacheFilePath))
             {
@@ -54,6 +58,7 @@ namespace VMM.Helper
                 }
             }
 
+#pragma warning disable CS4014
             CachingSyncSemaphore.WaitAsync().ContinueWith(async o =>
             {
                 try
@@ -73,34 +78,65 @@ namespace VMM.Helper
                     CachingSyncSemaphore.Release();
                 }
             });
+#pragma warning restore CS4014
 
             if(remoteFileSize > 0)
             {
-                return new BufferedStream(new SeekableStream(PlayClient.OpenRead(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
+                PlayClient.CancelAsync();
+
+                try
+                {
+                    return new BufferedStream(new SeekableStream(await PlayClient.OpenReadTaskAsync(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
+                }
+                catch(WebException e)
+                {
+                    if(e.Status == WebExceptionStatus.RequestCanceled)
+                    {
+                        throw new OperationCanceledException();
+                    }
+
+                    throw;
+                }
             }
 
             return Stream.Null;
         }
 
-        private static long GetRemoteFileSize(Uri uri)
+        private static async Task<long> GetRemoteFileSize(Uri uri)
         {
-            lock(SizeRetrievingClient)
+            _sizeRetrievingRequest?.Abort();
+
+            _sizeRetrievingRequest = (HttpWebRequest)WebRequest.Create(uri);
+            _sizeRetrievingRequest.Timeout
+                = _sizeRetrievingRequest.ContinueTimeout
+                    = SizeRetrievingTimeOut;
+            try
             {
-                try
-                {
-                    var stream = SizeRetrievingClient.OpenRead(uri);
+                var response = await _sizeRetrievingRequest.GetResponseAsync().WithTimeout(SizeRetrievingTimeOut);
+                var fileSize = response.ContentLength;
+                response.Close();
 
-                    var fileSize = long.Parse(SizeRetrievingClient.ResponseHeaders["Content-Length"]);
-                    stream?.Dispose();
+                return fileSize;
+            }
+            catch(WebException e)
+            {
+                if(e.Status == WebExceptionStatus.RequestCanceled)
+                    throw new OperationCanceledException();
 
-                    return fileSize;
-                }
-                catch(Exception e)
-                {
-                    Trace.WriteLine($"While getting file size: {e}");
+                throw;
+            }
+            catch(TimeoutException)
+            {
+                _sizeRetrievingRequest.Abort();
+                _sizeRetrievingRequest = null;
 
-                    return 0;
-                }
+                throw;
+            }
+            catch(Exception e)
+            {
+                Trace.WriteLine($"While getting file size: {e}");
+
+                throw;
             }
         }
     }
