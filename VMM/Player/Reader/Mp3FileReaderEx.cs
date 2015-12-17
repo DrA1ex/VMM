@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using NAudio.FileFormats.Mp3;
 using NAudio.Wave;
 
 //TODO: Need to refactor
@@ -184,7 +185,7 @@ namespace VMM.Player.Reader
         /// <param name="inputStream">The incoming stream containing MP3 data</param>
         /// <param name="duration">Duration of the song in seconds</param>
         public Mp3FileReaderEx(Stream inputStream, int duration)
-            : this(inputStream, CreateAcmFrameDecompressor, duration)
+            : this(inputStream, CreateDmoFrameDecompressor, duration)
         {
         }
 
@@ -357,14 +358,13 @@ namespace VMM.Player.Reader
         }
 
         /// <summary>
-        ///     Creates an ACM MP3 Frame decompressor. This is the default with NAudio
+        ///     Creates an DMO MP3 Frame decompressor.
         /// </summary>
         /// <param name="mp3Format">A WaveFormat object based </param>
         /// <returns></returns>
-        public static IMp3FrameDecompressor CreateAcmFrameDecompressor(WaveFormat mp3Format)
+        public static IMp3FrameDecompressor CreateDmoFrameDecompressor(WaveFormat mp3Format)
         {
-            // new DmoMp3FrameDecompressor(this.Mp3WaveFormat); 
-            return new AcmMp3FrameDecompressor(mp3Format);
+            return new DmoMp3FrameDecompressor(mp3Format);
         }
 
         private void CreateTableOfContents()
