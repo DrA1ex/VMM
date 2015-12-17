@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Net;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Threading;
@@ -18,27 +19,33 @@ namespace VMM
 
         private void TaskSchedulerOnUnobservedTaskException(object sender, UnobservedTaskExceptionEventArgs e)
         {
-            Trace.WriteLine($"Unhandeled task exception: {e.Exception}");
-
-            if(e.Exception.InnerException is AccessTokenInvalidException)
+            var innerException = e.Exception.InnerException;
+            if(innerException is AccessTokenInvalidException //if invalid authorization data
+               || innerException is OperationCanceledException //if some of operation was canceled
+               || innerException is WebException && ((WebException)innerException).Status == WebExceptionStatus.RequestCanceled) //if some of request was canceled
             {
                 e.SetObserved();
                 return;
             }
 
-            Dispatcher.Invoke(
-                () => { ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK); });
-
-            Environment.Exit(0);
+            ProcessUnhandledException(e.Exception);
         }
 
         private void AppDispatcherUnhandledException(object sender, DispatcherUnhandledExceptionEventArgs e)
         {
-            Trace.WriteLine($"Unhandeled exception: {e.Exception}");
+            ProcessUnhandledException(e.Exception);
+        }
 
-            ModernDialog.ShowMessage("Во время работы произошла критическая ошибка. Приложение будет закрыто :(", "Критическая ошибка", MessageBoxButton.OK);
+        private void ProcessUnhandledException(Exception e)
+        {
+            Trace.WriteLine($"Unhandeled exception: {e}");
+
+#if DEBUG
+            Dispatcher.Invoke(
+                () => { ModernDialog.ShowMessage($"Во время работы произошла непредвиденная ошибка: {e}", "Критическая ошибка", MessageBoxButton.OK); });
 
             Environment.Exit(0);
+#endif
         }
     }
 }
