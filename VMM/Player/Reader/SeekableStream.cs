@@ -16,7 +16,7 @@ namespace VMM.Player.Reader
 
         private Stream Stream { get; }
         private byte[] InternalBuffer { get; }
-        private long BufferedBytes { get; set; }
+        public long BufferedBytes { get; private set; }
         private long InternalPosition { get; set; }
 
         public override bool CanRead => true;

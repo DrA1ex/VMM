@@ -7,5 +7,7 @@ namespace VMM.Player.Reader
         event EventHandler<long> Buffed;
 
         long Length { get; }
+
+        long BufferedBytes { get; }
     }
 }

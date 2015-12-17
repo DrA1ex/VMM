@@ -13,7 +13,7 @@ namespace VMM.Player.Helper
     public static class CacheHelper
     {
         private const string TempPath = "VMM/Cache";
-        private const int DefaultStreamReadBufferSize = 128 * 1024;
+        private const int DefaultStreamReadBufferSize = 512 * 1024;
         private static readonly int SizeRetrievingTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
         private static readonly WebClient CacheWebClient = new WebClient();
@@ -61,7 +61,7 @@ namespace VMM.Player.Helper
                 try
                 {
                     var songStream = (await PlayRequest.GetResponseAsync()).GetResponseStream();
-                    return new BufferedObservableStream<SeekableStream>(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
+                    return new ReadAheadStream<SeekableStream>(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
                 }
                 catch(WebException e)
                 {
