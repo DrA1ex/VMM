@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Runtime.CompilerServices;
 using System.Windows.Threading;
 using JetBrains.Annotations;
+using NAudio.Wave;
 using VMM.Model;
 
 namespace VMM.Player
@@ -14,11 +15,13 @@ namespace VMM.Player
         private MusicPlayer()
         {
             Engine.PlaybackFinished += OnPlaybackFinished;
+            Engine.PlaybackFailed += (s, e) => OnPlaybackFinished(s, EventArgs.Empty);
+
+            Engine.PlaybackStateChanged += EngineOnPlaybackStateChanged;
 
             SeekTimer.Interval = TimeSpan.FromSeconds(0.33);
             SeekTimer.Tick += (sender, args) => OnPropertyChanged(nameof(Seek));
         }
-
 
         public static MusicPlayer Instance { get; } = new MusicPlayer();
         private MusicPlayerEngine Engine { get; } = new MusicPlayerEngine();
@@ -54,6 +57,11 @@ namespace VMM.Player
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void EngineOnPlaybackStateChanged(object sender, PlaybackState playbackState)
+        {
+            CurrentSong.IsPlaying = playbackState == PlaybackState.Playing;
+        }
 
         ~MusicPlayer()
         {

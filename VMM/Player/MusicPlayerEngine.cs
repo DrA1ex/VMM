@@ -101,12 +101,12 @@ namespace VMM.Player
             CancellationTokenSource = new CancellationTokenSource();
             var token = CancellationTokenSource.Token;
 
+            OnPlaybackStateChanged(PlaybackState.Playing);
+
             CacheHelper.Download(entry, token).ContinueWith(task =>
             {
                 try
                 {
-                    OnPlaybackStateChanged(PlaybackState.Playing);
-
                     CurrentReader = new Mp3FileReaderEx(task.Result, entry.Duration);
 
                     token.ThrowIfCancellationRequested();
