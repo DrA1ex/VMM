@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -16,7 +17,7 @@ namespace VMM.Player
         public MusicPlayerEngine()
         {
             WaveOut = new WaveOutEvent();
-            WaveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
+            WaveOut.PlaybackStopped += OnPlaybackFinished;
         }
 
         private SynchronizationContext SynchronizationContext { get; } = SynchronizationContext.Current ?? new SynchronizationContext();
@@ -24,6 +25,10 @@ namespace VMM.Player
 
         private WaveOutEvent WaveOut { get; }
         private Mp3FileReaderEx CurrentReader { get; set; }
+
+        private bool _isManualStoped;
+
+        private ConcurrentQueue<Mp3FileReaderEx> ReadersToDispose { get; } = new ConcurrentQueue<Mp3FileReaderEx>();
 
 #pragma warning disable 612
         public float Volume
@@ -41,12 +46,27 @@ namespace VMM.Player
 
         public void Dispose()
         {
-            WaveOut.PlaybackStopped -= WaveOutOnPlaybackStopped;
+            WaveOut.PlaybackStopped -= OnPlaybackFinished;
             WaveOut.Dispose();
         }
 
-        private void WaveOutOnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
+        private void OnPlaybackFinished(object sender, StoppedEventArgs stoppedEventArgs)
         {
+            while(!ReadersToDispose.IsEmpty)
+            {
+                Mp3FileReaderEx reader;
+                if(ReadersToDispose.TryDequeue(out reader))
+                {
+                    reader.Dispose();
+                }
+            }
+
+            if(_isManualStoped)
+            {
+                _isManualStoped = false;
+                return;
+            }
+
             if(stoppedEventArgs.Exception == null)
             {
                 OnSongFinished();
@@ -111,21 +131,23 @@ namespace VMM.Player
 
         public void Stop()
         {
-            WaveOut.PlaybackStopped -= WaveOutOnPlaybackStopped;
+            if(CurrentReader != null)
+            {
+                ReadersToDispose.Enqueue(CurrentReader);
+            }
+
+            //event will be raised only if playback isn' stoped
+            if(WaveOut.PlaybackState != PlaybackState.Stopped)
+            {
+                _isManualStoped = true;
+            }
             WaveOut.Stop();
-            WaveOut.PlaybackStopped += WaveOutOnPlaybackStopped;
 
             if(CancellationTokenSource != null)
             {
                 CancellationTokenSource.Cancel();
                 CancellationTokenSource.Dispose();
                 CancellationTokenSource = null;
-            }
-
-            if(CurrentReader != null)
-            {
-                CurrentReader.Dispose();
-                CurrentReader = null;
             }
 
             OnPlaybackStateChanged(PlaybackState.Stopped);

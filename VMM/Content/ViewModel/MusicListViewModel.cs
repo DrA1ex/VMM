@@ -45,7 +45,7 @@ namespace VMM.Content.ViewModel
 
         public MusicListViewModel()
         {
-            MusicPlayer.Instance.PlaybackStopped += delegate { PlayNext(); };
+            MusicPlayer.Instance.PlaybackFinished += OnPlaybackFinished;
             _isReadOnly = SettingsVault.Read().ReadOnly;
         }
 
@@ -138,6 +138,11 @@ namespace VMM.Content.ViewModel
         public ICommand PlayPreviousCommand => _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious));
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnPlaybackFinished(object sender, EventArgs args)
+        {
+            PlayNext();
+        }
 
         private void SaveSelected(MusicEntry[] musicEntries)
         {
@@ -374,9 +379,6 @@ namespace VMM.Content.ViewModel
                 musicEntry = Music.FirstOrDefault();
             }
 
-            if(MusicPlayer.Instance.CurrentSong != null && MusicPlayer.Instance.CurrentSong != musicEntry)
-                MusicPlayer.Instance.Stop();
-
             if(musicEntry != null)
             {
                 MusicPlayer.Instance.Play(musicEntry);
@@ -385,9 +387,6 @@ namespace VMM.Content.ViewModel
 
         private void PlayNext()
         {
-            if(MusicPlayer.Instance.CurrentSong != null)
-                MusicPlayer.Instance.Stop();
-
             var current = MusicPlayer.Instance.CurrentSong;
 
             var currentIndex = Music.IndexOf(current);

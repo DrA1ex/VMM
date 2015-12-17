@@ -60,11 +60,11 @@ namespace VMM.Player
             Dispose();
         }
 
-        public event EventHandler PlaybackStopped;
+        public event EventHandler PlaybackFinished;
 
         protected virtual void OnPlaybackFinished(object sender, EventArgs args)
         {
-            var handler = PlaybackStopped;
+            var handler = PlaybackFinished;
             handler?.Invoke(this, args);
         }
 

@@ -484,11 +484,18 @@ namespace VMM.Player.Reader
             return bytesRead;
         }
 
+        ~Mp3FileReaderEx()
+        {
+            Dispose(true);
+        }
+
         /// <summary>
         ///     Disposes this WaveStream
         /// </summary>
         protected override void Dispose(bool disposing)
         {
+            GC.SuppressFinalize(this);
+
             if(disposing)
             {
                 if(_mp3Stream != null)
