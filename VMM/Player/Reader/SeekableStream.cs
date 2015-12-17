@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace VMM.Player.Reader
 {
-    public class SeekableStream : Stream
+    public class SeekableStream : Stream, IBufferedObservable
     {
         public SeekableStream(Stream stream, long length)
         {
@@ -92,6 +92,8 @@ namespace VMM.Player.Reader
                 }
             }
 
+            OnBuffed(BufferedBytes);
+
             var canRead = Math.Min(InternalBuffer.Length - InternalPosition, count);
             Array.Copy(InternalBuffer, InternalPosition, buffer, offset, canRead);
 
@@ -99,6 +101,8 @@ namespace VMM.Player.Reader
 
             return (int)canRead;
         }
+
+        public event EventHandler<long> Buffed;
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -111,6 +115,11 @@ namespace VMM.Player.Reader
             ReadCancellationSource.Dispose();
 
             base.Dispose(disposing);
+        }
+
+        protected virtual void OnBuffed(long e)
+        {
+            Buffed?.Invoke(this, e);
         }
     }
 }

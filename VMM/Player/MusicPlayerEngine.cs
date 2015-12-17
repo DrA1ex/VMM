@@ -25,6 +25,7 @@ namespace VMM.Player
 
         private WaveOutEvent WaveOut { get; }
         private Mp3FileReaderEx CurrentReader { get; set; }
+        private IBufferedObservable CurrentBufferedStream { get; set; }
 
         private bool _isManualStoped;
 
@@ -107,7 +108,16 @@ namespace VMM.Player
             {
                 try
                 {
-                    CurrentReader = new Mp3FileReaderEx(task.Result, entry.Duration);
+                    var steam = task.Result;
+
+                    CurrentBufferedStream = steam as IBufferedObservable;
+                    if(CurrentBufferedStream != null)
+                    {
+                        CurrentBufferedStream.Buffed += OnBuffred;
+                    }
+
+                    OnBuffred(this, 0);
+                    CurrentReader = new Mp3FileReaderEx(steam, entry.Duration);
 
                     token.ThrowIfCancellationRequested();
 
@@ -135,6 +145,11 @@ namespace VMM.Player
             {
                 ReadersToDispose.Enqueue(CurrentReader);
             }
+            if(CurrentBufferedStream != null)
+            {
+                CurrentBufferedStream.Buffed -= OnBuffred;
+                CurrentBufferedStream = null;
+            }
 
             //event will be raised only if playback isn' stoped
             if(WaveOut.PlaybackState != PlaybackState.Stopped)
@@ -156,6 +171,7 @@ namespace VMM.Player
         public event EventHandler<PlaybackState> PlaybackStateChanged;
         public event EventHandler PlaybackFinished;
         public event EventHandler<MusicPlayerEngineException> PlaybackFailed;
+        public event EventHandler<double> Buffred;
 
         protected virtual void OnSongFinished()
         {
@@ -170,6 +186,12 @@ namespace VMM.Player
         protected virtual void OnPlaybackStateChanged(PlaybackState state)
         {
             SynchronizationContext.Post(sender => PlaybackStateChanged?.Invoke(sender, state), this);
+        }
+
+        protected virtual void OnBuffred(object sender, long e)
+        {
+            var bufferedPercentage = (double)e / CurrentBufferedStream?.Length;
+            SynchronizationContext.Post(s => Buffred?.Invoke(s, bufferedPercentage ?? 0), sender);
         }
     }
 }

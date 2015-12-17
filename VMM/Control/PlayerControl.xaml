@@ -49,8 +49,9 @@
             <TextBlock Text="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.Name}" Margin="3" />
         </DockPanel>
 
-        <control:SeekBar x:Name="SongSeekBar" Grid.Row="1" Grid.Column="3" Height="5"
-                         SeekValue="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=Seek, Mode=TwoWay}" />
+        <control:BufferedSeekBar x:Name="SongSeekBar" Grid.Row="1" Grid.Column="3" Height="5"
+                                 SeekValue="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=Seek, Mode=TwoWay}"
+                                 BufferedValue="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=Buffered, Mode=TwoWay}" />
         <control:SeekBar x:Name="VolumeBar" Grid.Row="1" Grid.Column="4" Height="5"
                          SeekValue="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=Volume, Mode=OneWayToSource}" />
 

@@ -68,7 +68,6 @@ namespace VMM.Model
             }
         }
 
-
         public event PropertyChangedEventHandler PropertyChanged;
 
         [NotifyPropertyChangedInvocator]

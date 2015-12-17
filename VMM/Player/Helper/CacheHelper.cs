@@ -61,7 +61,7 @@ namespace VMM.Player.Helper
                 try
                 {
                     var songStream = (await PlayRequest.GetResponseAsync()).GetResponseStream();
-                    return new BufferedStream(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
+                    return new BufferedObservableStream<SeekableStream>(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
                 }
                 catch(WebException e)
                 {
