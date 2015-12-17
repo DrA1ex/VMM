@@ -2,11 +2,11 @@
 using System.IO;
 using System.Threading;
 
-namespace VMM.Player.DataProvider
+namespace VMM.Player.Reader
 {
-    public class SeekableStream : System.IO.Stream
+    public class SeekableStream : Stream
     {
-        public SeekableStream(System.IO.Stream stream, long length)
+        public SeekableStream(Stream stream, long length)
         {
             Stream = stream;
             InternalBuffer = new byte[length];
@@ -14,7 +14,7 @@ namespace VMM.Player.DataProvider
 
         private CancellationTokenSource ReadCancellationSource { get; } = new CancellationTokenSource();
 
-        private System.IO.Stream Stream { get; }
+        private Stream Stream { get; }
         private byte[] InternalBuffer { get; }
         private long BufferedBytes { get; set; }
         private long InternalPosition { get; set; }

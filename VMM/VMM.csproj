@@ -95,10 +95,12 @@
     </Compile>
     <Compile Include="Converters\OrCompositeConverter.cs" />
     <Compile Include="Helper\TaskHelper.cs" />
+    <Compile Include="Player\Exceptions\MusicPlayerEngineException.cs" />
+    <Compile Include="Player\MusicPlayerEngine.cs" />
     <Compile Include="Player\Reader\Mp3FileReaderEx.cs" />
     <Compile Include="Player\Helper\CacheHelper.cs" />
     <Compile Include="Helper\ColorSerializationHelper.cs" />
-    <Compile Include="Player\DataProvider\SeekableStream.cs" />
+    <Compile Include="Player\Reader\SeekableStream.cs" />
     <Compile Include="Pages\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>

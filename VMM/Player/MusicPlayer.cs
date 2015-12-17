@@ -1,15 +1,9 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics;
-using System.IO;
 using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
 using System.Windows.Threading;
 using JetBrains.Annotations;
-using NAudio.Wave;
 using VMM.Model;
-using VMM.Player.Helper;
-using VMM.Player.Reader;
 
 namespace VMM.Player
 {
@@ -17,42 +11,30 @@ namespace VMM.Player
     {
         private MusicEntry _currentSong;
 
-        private DispatcherTimer _seekTimer;
-
-        static MusicPlayer()
-        {
-            Instance = new MusicPlayer();
-        }
-
         private MusicPlayer()
         {
-            WaveOut = new WaveOutEvent();
-            WaveOut.PlaybackStopped += OnPlaybackStopped;
+            Engine.PlaybackFinished += OnPlaybackFinished;
 
             SeekTimer.Interval = TimeSpan.FromSeconds(0.33);
             SeekTimer.Tick += (sender, args) => OnPropertyChanged(nameof(Seek));
         }
 
 
-        public static MusicPlayer Instance { get; private set; }
+        public static MusicPlayer Instance { get; } = new MusicPlayer();
+        private MusicPlayerEngine Engine { get; } = new MusicPlayerEngine();
 
-        private WaveOutEvent WaveOut { get; }
-        private Mp3FileReaderEx Reader { get; set; }
+        public DispatcherTimer SeekTimer { get; } = new DispatcherTimer();
 
-        public DispatcherTimer SeekTimer => _seekTimer ?? (_seekTimer = new DispatcherTimer());
-
-#pragma warning disable 612
         public double Volume
         {
-            get { return WaveOut.Volume; }
-            set { WaveOut.Volume = (float)value; }
+            get { return Engine.Volume; }
+            set { Engine.Volume = (float)value; }
         }
-#pragma warning restore 612
 
         public double Seek
         {
-            get { return Reader != null && WaveOut.PlaybackState != PlaybackState.Stopped ? (double)Reader.Position / Reader.Length : 0.0; }
-            set { Task.Run(() => Reader?.Seek((long)(value * Reader.Length), SeekOrigin.Begin)); }
+            get { return Engine.Seek; }
+            set { Engine.Seek = value; }
         }
 
         public MusicEntry CurrentSong
@@ -65,14 +47,10 @@ namespace VMM.Player
             }
         }
 
-        private bool IsStopManualy { get; set; }
-
         public void Dispose()
         {
             GC.SuppressFinalize(this);
-
-            Reader?.Dispose();
-            WaveOut.Dispose();
+            Engine.Dispose();
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
@@ -82,111 +60,37 @@ namespace VMM.Player
             Dispose();
         }
 
-        public event EventHandler<StoppedEventArgs> PlaybackStopped;
+        public event EventHandler PlaybackStopped;
 
-        protected virtual void OnPlaybackStopped(object sender, StoppedEventArgs stoppedEventArgs)
+        protected virtual void OnPlaybackFinished(object sender, EventArgs args)
         {
-            //PlaybackStopped raised not only when file was ended
-            //We need raise event only if playback stopped automatically
-            if(IsStopManualy)
-            {
-                IsStopManualy = false;
-                return;
-            }
-
-
             var handler = PlaybackStopped;
-            handler?.Invoke(this, stoppedEventArgs);
+            handler?.Invoke(this, args);
         }
 
-        public async Task Play(MusicEntry entry)
+        public void Play(MusicEntry entry)
         {
             if(CurrentSong == entry)
             {
-                if(WaveOut.PlaybackState == PlaybackState.Playing)
-                {
-                    Pause();
-                }
-                else
-                {
-                    Play();
-                }
-
+                Engine.PlayPause();
                 return;
             }
-
-            Reader?.Dispose();
 
             if(CurrentSong != null)
             {
                 CurrentSong.IsPlaying = false;
             }
 
+            Engine.Play(entry);
             CurrentSong = entry;
 
-            var dispatcher = Dispatcher.CurrentDispatcher;
-
-            try
-            {
-                CurrentSong.IsPlaying = true;
-
-                var stream = await CacheHelper.Download(entry);
-
-                Reader = new Mp3FileReaderEx(stream, entry.Duration);
-
-                dispatcher.Invoke(() =>
-                {
-                    WaveOut.Stop();
-                    WaveOut.Init(Reader);
-                    Play();
-                });
-            }
-            catch(OperationCanceledException)
-            {
-                //ignore
-            }
-            catch(Exception e)
-            {
-                Trace.WriteLine($"Unable to parse file: {e}");
-                throw;
-            }
+            SeekTimer.Start();
         }
 
         public void Stop()
         {
-            if(WaveOut.PlaybackState != PlaybackState.Stopped)
-            {
-                IsStopManualy = true;
-                WaveOut.Stop();
-
-                SeekTimer.Stop();
-            }
-
-            Reader?.Dispose();
-
-            if(CurrentSong != null)
-            {
-                CurrentSong.IsPlaying = false;
-            }
-        }
-
-        public void Pause()
-        {
-            if(WaveOut.PlaybackState == PlaybackState.Playing)
-            {
-                WaveOut.Pause();
-                CurrentSong.IsPlaying = false;
-
-                SeekTimer.Stop();
-            }
-        }
-
-        private void Play()
-        {
-            WaveOut.Play();
-
-            SeekTimer.Start();
-            OnPropertyChanged(nameof(Seek));
+            Engine.Stop();
+            SeekTimer.Stop();
         }
 
         [NotifyPropertyChangedInvocator]

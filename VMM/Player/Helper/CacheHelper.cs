@@ -6,7 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using VMM.Helper;
 using VMM.Model;
-using VMM.Player.DataProvider;
+using VMM.Player.Reader;
 
 namespace VMM.Player.Helper
 {
@@ -14,25 +14,16 @@ namespace VMM.Player.Helper
     {
         private const string TempPath = "VMM/Cache";
         private const int DefaultStreamReadBufferSize = 128 * 1024;
-
-        private static readonly WebClient CacheWebClient = new WebClient();
-        private static readonly WebClient PlayClient = new WebClient();
-
-        private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
-
-        private static HttpWebRequest _sizeRetrievingRequest;
-
         private static readonly int SizeRetrievingTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
-        public static Task<Stream> Download(MusicEntry entry)
-        {
-            return DownloadInternal(entry);
-        }
+        private static readonly WebClient CacheWebClient = new WebClient();
 
-        private static async Task<Stream> DownloadInternal(MusicEntry entry)
-        {
-            byte[] data;
+        private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
+        private static HttpWebRequest PlayRequest { get; set; }
+        private static HttpWebRequest SizeRetrievingRequest { get; set; }
 
+        public static async Task<Stream> Download(MusicEntry entry, CancellationToken ct)
+        {
             var cachePath = Path.Combine(Path.GetTempPath(), TempPath);
             if(!Directory.Exists(cachePath))
             {
@@ -40,7 +31,7 @@ namespace VMM.Player.Helper
             }
 
             var cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
-            var remoteFileSize = await GetRemoteFileSize(entry.Url);
+            var remoteFileSize = await GetRemoteFileSize(entry.Url, ct);
 
             if(File.Exists(cacheFilePath))
             {
@@ -60,7 +51,35 @@ namespace VMM.Player.Helper
                 }
             }
 
-#pragma warning disable CS4014
+            QueueCaching(entry, cacheFilePath);
+
+            if(remoteFileSize > 0)
+            {
+                PlayRequest?.Abort();
+                PlayRequest = WebRequest.CreateHttp(entry.Url);
+
+                try
+                {
+                    var songStream = (await PlayRequest.GetResponseAsync()).GetResponseStream();
+                    return new BufferedStream(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
+                }
+                catch(WebException e)
+                {
+                    if(e.Status == WebExceptionStatus.RequestCanceled)
+                    {
+                        throw new OperationCanceledException();
+                    }
+
+                    throw;
+                }
+            }
+
+            return Stream.Null;
+        }
+
+        private static void QueueCaching(MusicEntry entry, string cacheFilePath)
+        {
+            byte[] data;
             CachingSyncSemaphore.WaitAsync().ContinueWith(async o =>
             {
                 try
@@ -80,41 +99,19 @@ namespace VMM.Player.Helper
                     CachingSyncSemaphore.Release();
                 }
             });
-#pragma warning restore CS4014
-
-            if(remoteFileSize > 0)
-            {
-                PlayClient.CancelAsync();
-
-                try
-                {
-                    return new BufferedStream(new SeekableStream(await PlayClient.OpenReadTaskAsync(entry.Url), remoteFileSize), DefaultStreamReadBufferSize);
-                }
-                catch(WebException e)
-                {
-                    if(e.Status == WebExceptionStatus.RequestCanceled)
-                    {
-                        throw new OperationCanceledException();
-                    }
-
-                    throw;
-                }
-            }
-
-            return Stream.Null;
         }
 
-        private static async Task<long> GetRemoteFileSize(Uri uri)
+        private static async Task<long> GetRemoteFileSize(Uri uri, CancellationToken ct)
         {
-            _sizeRetrievingRequest?.Abort();
+            SizeRetrievingRequest?.Abort();
 
-            _sizeRetrievingRequest = (HttpWebRequest)WebRequest.Create(uri);
-            _sizeRetrievingRequest.Timeout
-                = _sizeRetrievingRequest.ContinueTimeout
+            SizeRetrievingRequest = (HttpWebRequest)WebRequest.Create(uri);
+            SizeRetrievingRequest.Timeout
+                = SizeRetrievingRequest.ContinueTimeout
                     = SizeRetrievingTimeOut;
             try
             {
-                var response = await _sizeRetrievingRequest.GetResponseAsync().WithTimeout(SizeRetrievingTimeOut);
+                var response = await SizeRetrievingRequest.GetResponseAsync().WithTimeout(SizeRetrievingTimeOut, ct);
                 var fileSize = response.ContentLength;
                 response.Close();
 
@@ -129,9 +126,13 @@ namespace VMM.Player.Helper
             }
             catch(TimeoutException)
             {
-                _sizeRetrievingRequest.Abort();
-                _sizeRetrievingRequest = null;
+                SizeRetrievingRequest.Abort();
+                SizeRetrievingRequest = null;
 
+                throw;
+            }
+            catch(OperationCanceledException)
+            {
                 throw;
             }
             catch(Exception e)

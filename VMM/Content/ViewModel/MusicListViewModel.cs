@@ -376,18 +376,10 @@ namespace VMM.Content.ViewModel
 
             if(MusicPlayer.Instance.CurrentSong != null && MusicPlayer.Instance.CurrentSong != musicEntry)
                 MusicPlayer.Instance.Stop();
-            var dispatcher = Dispatcher.CurrentDispatcher;
 
             if(musicEntry != null)
             {
-                MusicPlayer.Instance.Play(musicEntry).ContinueWith(t =>
-                {
-                    if(t.IsFaulted)
-                    {
-                        t.Exception?.Handle((e) => true);
-                        dispatcher.InvokeAsync(PlayNext);
-                    }
-                });
+                MusicPlayer.Instance.Play(musicEntry);
             }
         }
 
