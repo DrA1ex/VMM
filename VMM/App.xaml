@@ -4,6 +4,7 @@
              xmlns:converters="clr-namespace:VMM.Converters"
              xmlns:mui="http://firstfloorsoftware.com/ModernUI"
              xmlns:utils="clr-namespace:VMM.Player"
+             xmlns:view="clr-namespace:VMM.Content.View"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
         <ResourceDictionary>
@@ -54,8 +55,8 @@
                     <DataTrigger Value="True">
                         <DataTrigger.Binding>
                             <MultiBinding Converter="{StaticResource OrCompositeConverter}">
-                                <Binding ElementName="Self" Path="DataContext.SavingInProgress" />
-                                <Binding Path="IsLoading" />
+                                <Binding Path="SavingInProgress" />
+                                <Binding Path="DataContext.IsLoading" RelativeSource="{RelativeSource AncestorType={x:Type view:MusicEntryView}}" />
                             </MultiBinding>
                         </DataTrigger.Binding>
                         <Setter Property="IconData" Value="{StaticResource WaitIcon}" />

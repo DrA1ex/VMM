@@ -99,7 +99,7 @@
             </ListView.ItemContainerStyle>
             <ListView.ItemTemplate>
                 <DataTemplate>
-                    <view:MusicEntryView DataContext="{Binding}" />
+                    <view:MusicEntryView/>
                 </DataTemplate>
             </ListView.ItemTemplate>
         </ListView>

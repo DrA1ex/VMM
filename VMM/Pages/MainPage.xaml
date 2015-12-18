@@ -24,7 +24,7 @@
                 <Border Background="{DynamicResource WindowBackground}" Height="150" VerticalAlignment="Center">
                     <DockPanel>
                         <TextBlock Text="{Binding ElementName=MusicList, Path=DataContext.BusyText}"
-                                   Style="{StaticResource Heading2}"
+                                   Style="{DynamicResource Heading2}"
                                    HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top"
                                    TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" />
                         <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0"

@@ -28,7 +28,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _savingInProgress = value;
-                OnPropertyChanged("SavingInProgress");
+                OnPropertyChanged(nameof(SavingInProgress));
             }
         }
 
@@ -39,15 +39,14 @@ namespace VMM.Content.ViewModel
         {
             var dlg = new SaveFileDialog
             {
-                FileName = string.Format("{0}.mp3",
-                    new string(string.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())),
+                FileName = $"{new string($"{song.Artist} - {song.Name}".Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())}.mp3",
                 Filter = "Файл mp3|*.mp3"
             };
 
             if(dlg.ShowDialog(Application.Current.MainWindow) == true)
             {
                 SavingInProgress = true;
-                var disp = Dispatcher.CurrentDispatcher;
+                var currentDispatcher = Dispatcher.CurrentDispatcher;
 
                 Task.Run(() =>
                 {
@@ -61,11 +60,11 @@ namespace VMM.Content.ViewModel
                     }
                     catch(Exception e)
                     {
-                        Trace.WriteLine(string.Format("While saving file: {0}", e));
+                        Trace.WriteLine($"While saving file: {e}");
                     }
                     finally
                     {
-                        disp.Invoke(() => { SavingInProgress = false; });
+                        currentDispatcher.Invoke(() => { SavingInProgress = false; });
                     }
                 });
             }
@@ -75,10 +74,7 @@ namespace VMM.Content.ViewModel
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }
