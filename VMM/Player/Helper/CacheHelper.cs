@@ -16,9 +16,8 @@ namespace VMM.Player.Helper
         private const int DefaultStreamReadBufferSize = 512 * 1024;
         private static readonly int SizeRetrievingTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
-        private static readonly WebClient CacheWebClient = new WebClient();
-
         private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
+        private static HttpWebRequest CachingRequest { get; set; }
         private static HttpWebRequest PlayRequest { get; set; }
         private static HttpWebRequest SizeRetrievingRequest { get; set; }
 
@@ -63,14 +62,9 @@ namespace VMM.Player.Helper
                     var songStream = (await PlayRequest.GetResponseAsync()).GetResponseStream();
                     return new ReadAheadStream<SeekableStream>(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
                 }
-                catch(WebException e)
+                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
                 {
-                    if(e.Status == WebExceptionStatus.RequestCanceled)
-                    {
-                        throw new OperationCanceledException();
-                    }
-
-                    throw;
+                    throw new OperationCanceledException();
                 }
             }
 
@@ -79,15 +73,35 @@ namespace VMM.Player.Helper
 
         private static void QueueCaching(MusicEntry entry, string cacheFilePath)
         {
-            byte[] data;
+            CachingRequest?.Abort();
+            CachingRequest = WebRequest.CreateHttp(entry.Url);
+
+            var thisRequest = CachingRequest;
+
             CachingSyncSemaphore.WaitAsync().ContinueWith(async o =>
             {
                 try
                 {
                     entry.IsLoading = true;
 
-                    data = await CacheWebClient.DownloadDataTaskAsync(entry.Url);
-                    File.WriteAllBytes(cacheFilePath, data);
+                    using(var response = await thisRequest.GetResponseAsync())
+                    using(var stream = response.GetResponseStream())
+                    using(var resultStream = new MemoryStream((int)response.ContentLength))
+                    {
+                        if(stream != null)
+                        {
+                            await stream.CopyToAsync(resultStream);
+
+                            using(var fileStream = new FileStream(cacheFilePath, FileMode.Create))
+                            {
+                                await resultStream.CopyToAsync(fileStream);
+                            }
+                        }
+                    }
+                }
+                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
+                {
+                    //ingore
                 }
                 catch(Exception e)
                 {
@@ -117,12 +131,9 @@ namespace VMM.Player.Helper
 
                 return fileSize;
             }
-            catch(WebException e)
+            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
             {
-                if(e.Status == WebExceptionStatus.RequestCanceled)
-                    throw new OperationCanceledException();
-
-                throw;
+                throw new OperationCanceledException();
             }
             catch(TimeoutException)
             {
