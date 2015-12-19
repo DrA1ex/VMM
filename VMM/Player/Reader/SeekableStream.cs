@@ -1,5 +1,6 @@
 ﻿using System;
 using System.IO;
+using System.Net;
 using System.Threading;
 
 namespace VMM.Player.Reader
@@ -18,14 +19,12 @@ namespace VMM.Player.Reader
 
         private Stream Stream { get; }
         private byte[] InternalBuffer { get; }
-        public long BufferedBytes { get; private set; }
         private long LastBufferedEventValue { get; set; }
         private long InternalPosition { get; set; }
 
         public override bool CanRead => true;
         public override bool CanSeek => true;
         public override bool CanWrite => false;
-        public override long Length => InternalBuffer.Length;
 
         public override long Position
         {
@@ -42,6 +41,11 @@ namespace VMM.Player.Reader
                 }
             }
         }
+
+        public long BufferedBytes { get; private set; }
+        public override long Length => InternalBuffer.Length;
+
+        public event EventHandler<long> Buffed;
 
         public override void Flush()
         {
@@ -89,11 +93,16 @@ namespace VMM.Player.Reader
                         needToRead -= readed;
                     }
                 }
-                catch(Exception)
+                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
                 {
-                    throw new EndOfStreamException("Stream closed");
+                    throw new EndOfStreamException("Stream was closed because underlying WebRequest was canceled"
+                        , new OperationCanceledException("WebRequest was canceled", e));
                 }
-                if(BufferedBytes - LastBufferedEventValue > BufferedRaiseThreshold) 
+                catch(Exception e)
+                {
+                    throw new EndOfStreamException("Unable to read from stream", e);
+                }
+                if(BufferedBytes - LastBufferedEventValue > BufferedRaiseThreshold)
                 {
                     OnBuffed(BufferedBytes);
                     LastBufferedEventValue = BufferedBytes;
@@ -107,8 +116,6 @@ namespace VMM.Player.Reader
 
             return (int)canRead;
         }
-
-        public event EventHandler<long> Buffed;
 
         public override void Write(byte[] buffer, int offset, int count)
         {

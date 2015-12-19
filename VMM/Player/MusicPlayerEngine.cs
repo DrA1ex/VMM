@@ -14,6 +14,8 @@ namespace VMM.Player
 {
     public class MusicPlayerEngine : IDisposable
     {
+        private bool _isManualStoped;
+
         public MusicPlayerEngine()
         {
             WaveOut = new WaveOutEvent();
@@ -26,8 +28,6 @@ namespace VMM.Player
         private WaveOutEvent WaveOut { get; }
         private Mp3FileReaderEx CurrentReader { get; set; }
         private IBufferedObservable CurrentBufferedStream { get; set; }
-
-        private bool _isManualStoped;
 
         private ConcurrentQueue<Mp3FileReaderEx> ReadersToDispose { get; } = new ConcurrentQueue<Mp3FileReaderEx>();
 
@@ -128,7 +128,8 @@ namespace VMM.Player
                 {
                     OnError(new MusicPlayerEngineException(EngineError.NetworkError, e));
                 }
-                catch(OperationCanceledException)
+                catch(Exception e) when(e is OperationCanceledException
+                                        || e is EndOfStreamException && e.InnerException is OperationCanceledException)
                 {
                     //ignore
                 }
