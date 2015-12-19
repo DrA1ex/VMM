@@ -46,6 +46,7 @@ namespace VMM.Content.ViewModel
         public MusicListViewModel()
         {
             MusicPlayer.Instance.PlaybackFinished += OnPlaybackFinished;
+            MusicPlayer.Instance.EntryPlayed += OnEntryPlayed;
             _isReadOnly = SettingsVault.Read().ReadOnly;
         }
 
@@ -444,6 +445,13 @@ namespace VMM.Content.ViewModel
                 Music.Move(srcIndex, targetIndex);
                 IsModified = true;
             }
+        }
+
+        public event EventHandler<MusicEntry> EntryPlayed;
+
+        protected virtual void OnEntryPlayed(object sender, MusicEntry musicEntry)
+        {
+            EntryPlayed?.Invoke(sender, musicEntry);
         }
     }
 }

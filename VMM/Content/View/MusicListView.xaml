@@ -3,8 +3,10 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:i="http://schemas.microsoft.com/expression/2010/interactivity"
              xmlns:view="clr-namespace:VMM.Content.View"
              xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
+             xmlns:behavior="clr-namespace:VMM.Control.Behavior"
              mc:Ignorable="d" d:DataContext="{d:DesignInstance viewModel:MusicListViewModel}"
              d:DesignHeight="300" d:DesignWidth="300" Loaded="ViewLoaded">
 
@@ -102,6 +104,9 @@
                     <view:MusicEntryView/>
                 </DataTemplate>
             </ListView.ItemTemplate>
+            <i:Interaction.Behaviors>
+                <behavior:ScrollIntoViewBehavior/>
+            </i:Interaction.Behaviors>
         </ListView>
     </Grid>
 </UserControl>

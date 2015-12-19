@@ -13,14 +13,13 @@ namespace VMM.Content.View
 {
     public partial class MusicListView : INotifyPropertyChanged
     {
-        private MusicListViewModel _model;
-
         public MusicListView()
         {
             InitializeComponent();
 
             DataContext = Model;
             MusciView.SelectionChanged += MusciViewOnSelectionChanged;
+            Model.EntryPlayed += OnEntryPlayed;
 
 
             var itemContainerStyle = MusciView.ItemContainerStyle ?? new Style(typeof(ListViewItem));
@@ -32,7 +31,7 @@ namespace VMM.Content.View
         }
 
 
-        public MusicListViewModel Model => _model ?? (_model = new MusicListViewModel());
+        public MusicListViewModel Model { get; } = new MusicListViewModel();
 
         public MusicEntry[] SelectedItems
         {
@@ -47,6 +46,14 @@ namespace VMM.Content.View
         }
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void OnEntryPlayed(object sender, MusicEntry musicEntry)
+        {
+            if(MusciView.SelectedItems == null || MusciView.SelectedItems.Count <= 1)
+            {
+                MusciView.SelectedItem = musicEntry;
+            }
+        }
 
         private void MusicViewDragOver(object sender, DragEventArgs e)
         {
@@ -90,7 +97,7 @@ namespace VMM.Content.View
 
         private void MusciViewOnSelectionChanged(object sender, SelectionChangedEventArgs selectionChangedEventArgs)
         {
-            OnPropertyChanged("SelectedItems");
+            OnPropertyChanged(nameof(SelectedItems));
         }
 
         private void ViewLoaded(object sender, RoutedEventArgs e)
@@ -105,10 +112,7 @@ namespace VMM.Content.View
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
             var handler = PropertyChanged;
-            if(handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
     }
 }

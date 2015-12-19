@@ -73,6 +73,10 @@ namespace VMM.Player
         private void EngineOnPlaybackStateChanged(object sender, PlaybackState playbackState)
         {
             CurrentSong.IsPlaying = playbackState == PlaybackState.Playing;
+            if(CurrentSong.IsPlaying)
+            {
+                OnEntryPlayed(CurrentSong);
+            }
         }
 
         ~MusicPlayer()
@@ -81,6 +85,7 @@ namespace VMM.Player
         }
 
         public event EventHandler PlaybackFinished;
+        public event EventHandler<MusicEntry> EntryPlayed;
 
         protected virtual void OnPlaybackFinished(object sender, EventArgs args)
         {
@@ -118,6 +123,11 @@ namespace VMM.Player
         {
             var handler = PropertyChanged;
             handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        protected virtual void OnEntryPlayed(MusicEntry e)
+        {
+            EntryPlayed?.Invoke(this, e);
         }
     }
 }

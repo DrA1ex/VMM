@@ -5,8 +5,6 @@ namespace VMM.Content.View
 {
     public partial class MusicEntryView
     {
-        private MusicEntryViewModel _model;
-
         public MusicEntryView()
         {
             InitializeComponent();
@@ -14,6 +12,6 @@ namespace VMM.Content.View
             ActionsDock.DataContext = Model;
         }
 
-        public MusicEntryViewModel Model => _model ?? (_model = new MusicEntryViewModel());
+        public MusicEntryViewModel Model { get; } = new MusicEntryViewModel();
     }
 }
