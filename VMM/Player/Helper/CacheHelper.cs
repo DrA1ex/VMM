@@ -45,7 +45,14 @@ namespace VMM.Player.Helper
             }
 
             QueueCaching(entry, cacheFilePath);
-            PlayRequest?.Abort();
+            try
+            {
+                PlayRequest?.Abort();
+            }
+            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
+            {
+                //ignore
+            }            
             PlayRequest = WebRequest.CreateHttp(entry.Url);
 
             try
@@ -62,7 +69,15 @@ namespace VMM.Player.Helper
 
         private static void QueueCaching(MusicEntry entry, string cacheFilePath)
         {
-            CachingRequest?.Abort();
+            try
+            {
+                CachingRequest?.Abort();
+            }
+            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
+            {
+                //ignore
+            }
+
             CachingRequest = WebRequest.CreateHttp(entry.Url);
 
             var thisRequest = CachingRequest;
@@ -75,15 +90,21 @@ namespace VMM.Player.Helper
 
                     using(var response = await thisRequest.GetResponseAsync())
                     using(var stream = response.GetResponseStream())
-                    using(var resultStream = new MemoryStream((int)response.ContentLength))
                     {
-                        if(stream != null)
+                        if(response.ContentLength > 0)
                         {
-                            await stream.CopyToAsync(resultStream);
-
-                            using(var fileStream = new FileStream(cacheFilePath, FileMode.Create))
+                            using(var resultStream = new MemoryStream((int)response.ContentLength))
                             {
-                                await resultStream.CopyToAsync(fileStream);
+                                if(stream != null)
+                                {
+                                    await stream.CopyToAsync(resultStream);
+
+                                    using(var fileStream = new FileStream(cacheFilePath, FileMode.Create))
+                                    {
+                                        resultStream.Position = 0;
+                                        await resultStream.CopyToAsync(fileStream);
+                                    }
+                                }
                             }
                         }
                     }

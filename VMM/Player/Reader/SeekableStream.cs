@@ -88,7 +88,7 @@ namespace VMM.Player.Reader
                 }
                 catch(Exception)
                 {
-                    return 0;
+                    throw new EndOfStreamException("Stream closed");
                 }
             }
 
