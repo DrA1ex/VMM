@@ -6,6 +6,8 @@ namespace VMM.Player.Reader
 {
     public class SeekableStream : Stream, IBufferedObservable
     {
+        private const int BufferedRaiseThreshold = 1024 * 100; //Every 100 KiB
+
         public SeekableStream(Stream stream, long length)
         {
             Stream = stream;
@@ -17,6 +19,7 @@ namespace VMM.Player.Reader
         private Stream Stream { get; }
         private byte[] InternalBuffer { get; }
         public long BufferedBytes { get; private set; }
+        private long LastBufferedEventValue { get; set; }
         private long InternalPosition { get; set; }
 
         public override bool CanRead => true;
@@ -90,9 +93,12 @@ namespace VMM.Player.Reader
                 {
                     throw new EndOfStreamException("Stream closed");
                 }
+                if(BufferedBytes - LastBufferedEventValue > BufferedRaiseThreshold) 
+                {
+                    OnBuffed(BufferedBytes);
+                    LastBufferedEventValue = BufferedBytes;
+                }
             }
-
-            OnBuffed(BufferedBytes);
 
             var canRead = Math.Min(InternalBuffer.Length - InternalPosition, count);
             Array.Copy(InternalBuffer, InternalPosition, buffer, offset, canRead);
