@@ -59,14 +59,17 @@
                             <Setter Property="IconWidth" Value="14" />
                         </Style>
                     </DockPanel.Resources>
-                    <mui:ModernButton Content="Обновить" IconData="{StaticResource RefreshIcon}"
+                    <mui:ModernButton IconData="{StaticResource RefreshIcon}" ToolTip="Обновить"
+                                      EllipseDiameter="32" IconHeight="24" IconWidth="24" EllipseStrokeThickness="0"
                                       Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}" />
-                    <mui:ModernButton Content="Сортировать" IconData="{StaticResource SortIcon}"
+                    <mui:ModernButton IconData="{StaticResource SortIcon}" ToolTip="Сортировать"
                                       Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"
                                       CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"
+                                      EllipseDiameter="32" IconHeight="26" IconWidth="26" EllipseStrokeThickness="0"
                                       Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}" />
-                    <mui:ModernButton Content="Применить изменения" IconData="{StaticResource ApplyIcon}"
+                    <mui:ModernButton IconData="{StaticResource ApplyIcon}" ToolTip="Сохранить изменения"
                                       Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}"
+                                      EllipseDiameter="32" IconHeight="24" IconWidth="24" EllipseStrokeThickness="0"
                                       Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}" />
                 </DockPanel>
             </Grid>

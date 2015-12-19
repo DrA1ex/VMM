@@ -13,5 +13,10 @@ namespace VMM.Content.View
         }
 
         public MusicEntryViewModel Model { get; } = new MusicEntryViewModel();
+
+        private void ModernButton_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
     }
 }

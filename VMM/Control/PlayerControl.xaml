@@ -33,21 +33,24 @@
             <ColumnDefinition Width="100" />
         </Grid.ColumnDefinitions>
 
-        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="10" IconWidth="10"
+        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="16" IconWidth="16"
+                          EllipseStrokeThickness="0"
                           Command="{Binding PlaySongCommand}"
                           CommandParameter="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong}"
                           Style="{StaticResource PlayerPlayingIconStyle}" />
         <mui:ModernButton Grid.Row="0" Grid.Column="1" Grid.RowSpan="2" IconData="{StaticResource PreviousIcon}"
+                          EllipseDiameter="24" IconHeight="12" IconWidth="12" EllipseStrokeThickness="0"
                           Command="{Binding PlayPreviousCommand}" />
         <mui:ModernButton Grid.Row="0" Grid.Column="2" Grid.RowSpan="2" IconData="{StaticResource NextIcon}"
+                          EllipseDiameter="24" IconHeight="12" IconWidth="12" EllipseStrokeThickness="0"
                           Command="{Binding PlayNextCommand}" />
 
-        <DockPanel Grid.Row="0" Grid.Column="3">
-            <TextBlock
-                Text="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.Artist, StringFormat={}{0} —}"
-                FontWeight="Bold" Margin="10,3,3,3" />
-            <TextBlock Text="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.Name}" Margin="3" />
-        </DockPanel>
+
+        <TextBlock Grid.Row="0" Grid.Column="3" Margin="0,3,3,3">
+            <Run Text="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.Artist, Mode=OneWay, StringFormat='{}{0} — '}"
+                 FontWeight="Bold" />
+            <Run Text="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong.Name, Mode=OneWay}" />
+        </TextBlock>
 
         <control:BufferedSeekBar x:Name="SongSeekBar" Grid.Row="1" Grid.Column="3" Height="5"
                                  SeekValue="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=Seek, Mode=TwoWay}"
