@@ -14,12 +14,11 @@ namespace VMM.Player.Helper
     {
         private const string TempPath = "VMM/Cache";
         private const int DefaultStreamReadBufferSize = 512 * 1024;
-        private static readonly int SizeRetrievingTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
+        private static readonly int ResponseTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
         private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
         private static HttpWebRequest CachingRequest { get; set; }
         private static HttpWebRequest PlayRequest { get; set; }
-        private static HttpWebRequest SizeRetrievingRequest { get; set; }
 
         public static async Task<Stream> Download(MusicEntry entry, CancellationToken ct)
         {
@@ -30,7 +29,6 @@ namespace VMM.Player.Helper
             }
 
             var cacheFilePath = Path.Combine(cachePath, entry.Id.ToString());
-            var remoteFileSize = await GetRemoteFileSize(entry.Url, ct);
 
             if(File.Exists(cacheFilePath))
             {
@@ -38,11 +36,7 @@ namespace VMM.Player.Helper
 
                 try
                 {
-                    var cacheSize = new FileInfo(cacheFilePath).Length;
-                    if(remoteFileSize == cacheSize)
-                    {
-                        return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
-                    }
+                    return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
                 }
                 finally
                 {
@@ -51,24 +45,19 @@ namespace VMM.Player.Helper
             }
 
             QueueCaching(entry, cacheFilePath);
+            PlayRequest?.Abort();
+            PlayRequest = WebRequest.CreateHttp(entry.Url);
 
-            if(remoteFileSize > 0)
+            try
             {
-                PlayRequest?.Abort();
-                PlayRequest = WebRequest.CreateHttp(entry.Url);
-
-                try
-                {
-                    var songStream = (await PlayRequest.GetResponseAsync()).GetResponseStream();
-                    return new ReadAheadStream<SeekableStream>(new SeekableStream(songStream, remoteFileSize), DefaultStreamReadBufferSize);
-                }
-                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
-                {
-                    throw new OperationCanceledException();
-                }
+                var response = await PlayRequest.GetResponseAsync().WithTimeout(ResponseTimeOut, ct);
+                var songStream = response.GetResponseStream();
+                return new ReadAheadStream<SeekableStream>(new SeekableStream(songStream, response.ContentLength), DefaultStreamReadBufferSize);
             }
-
-            return Stream.Null;
+            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
+            {
+                throw new OperationCanceledException();
+            }
         }
 
         private static void QueueCaching(MusicEntry entry, string cacheFilePath)
@@ -113,45 +102,6 @@ namespace VMM.Player.Helper
                     CachingSyncSemaphore.Release();
                 }
             });
-        }
-
-        private static async Task<long> GetRemoteFileSize(Uri uri, CancellationToken ct)
-        {
-            SizeRetrievingRequest?.Abort();
-
-            SizeRetrievingRequest = (HttpWebRequest)WebRequest.Create(uri);
-            SizeRetrievingRequest.Timeout
-                = SizeRetrievingRequest.ContinueTimeout
-                    = SizeRetrievingTimeOut;
-            try
-            {
-                var response = await SizeRetrievingRequest.GetResponseAsync().WithTimeout(SizeRetrievingTimeOut, ct);
-                var fileSize = response.ContentLength;
-                response.Close();
-
-                return fileSize;
-            }
-            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
-            {
-                throw new OperationCanceledException();
-            }
-            catch(TimeoutException)
-            {
-                SizeRetrievingRequest.Abort();
-                SizeRetrievingRequest = null;
-
-                throw;
-            }
-            catch(OperationCanceledException)
-            {
-                throw;
-            }
-            catch(Exception e)
-            {
-                Trace.WriteLine($"While getting file size: {e}");
-
-                throw;
-            }
         }
     }
 }
