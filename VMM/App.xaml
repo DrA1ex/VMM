@@ -33,10 +33,10 @@
             <PathGeometry x:Key="UpIcon">F1 M 34,57L 42,57L 42,32.25L 52,42.25L 52,31.75L 38,17.75L 24,31.75L 24,42.25L 34,32.25L 34,57 Z</PathGeometry>
             <PathGeometry x:Key="DownIcon">F1 M 42,19.0002L 34,19.0002L 34,43.7502L 24,33.7502L 24,44.2502L 38,58.2502L 52,44.2502L 52,33.7502L 42,43.7502L 42,19.0002 Z</PathGeometry>
 
-            <PathGeometry x:Key="PlayIcon">F1 M 30.0833,22.1667L 50.6665,37.6043L 50.6665,38.7918L 30.0833,53.8333L 30.0833,22.1667 Z</PathGeometry>
-            <PathGeometry x:Key="PauseIcon">F1 M 26.9167,23.75L 33.25,23.75L 33.25,52.25L 26.9167,52.25L 26.9167,23.75 Z M 42.75,23.75L 49.0833,23.75L 49.0833,52.25L 42.75,52.25L 42.75,23.75 Z</PathGeometry>
-            <PathGeometry x:Key="NextIcon">F1 M 42.3542,38L 26.5208,53.8333L 37.2083,53.8333L 53.8333,38L 37.2083,22.1667L 26.5208,22.1667L 42.3542,38 Z</PathGeometry>
-            <PathGeometry x:Key="PreviousIcon">F1 M 33.6458,38L 49.4792,53.8333L 38.7917,53.8333L 22.1667,38L 38.7917,22.1667L 49.4792,22.1667L 33.6458,38 Z</PathGeometry>
+            <PathGeometry x:Key="PlayIcon">M8,5.14V19.14L19,12.14L8,5.14Z</PathGeometry>
+            <PathGeometry x:Key="PauseIcon">M14,19.14H18V5.14H14M6,19.14H10V5.14H6V19.14Z</PathGeometry>
+            <PathGeometry x:Key="NextIcon">M16,18.14H18V6.14H16M6,18.14L14.5,12.14L6,6.14V18.14Z</PathGeometry>
+            <PathGeometry x:Key="PreviousIcon">M6,18.14V6.14H8V18.14H6M9.5,12.14L18,6.14V18.14L9.5,12.14Z</PathGeometry>
 
             <Style x:Key="EntryPlayingIconStyle" TargetType="mui:ModernButton">
                 <Setter Property="IconData" Value="{StaticResource PlayIcon}" />

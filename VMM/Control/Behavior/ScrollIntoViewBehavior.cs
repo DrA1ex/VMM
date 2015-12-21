@@ -33,9 +33,9 @@ namespace VMM.Control.Behavior
                     {
                         scrollView.ScrollToVerticalOffset(selectedIndex);
                     }
-                    else if(scrollView.VerticalOffset + scrollView.ViewportHeight < selectedIndex)
+                    else if(scrollView.VerticalOffset + scrollView.ViewportHeight < selectedIndex + 1)
                     {
-                        scrollView.ScrollToVerticalOffset(Math.Max(0, selectedIndex - scrollView.ViewportHeight));
+                        scrollView.ScrollToVerticalOffset(Math.Max(0, selectedIndex - scrollView.ViewportHeight + 1));
                     }
                 }
             }
