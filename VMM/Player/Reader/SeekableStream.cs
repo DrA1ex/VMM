@@ -8,11 +8,17 @@ namespace VMM.Player.Reader
     public class SeekableStream : Stream, IBufferedObservable
     {
         private const int BufferedRaiseThreshold = 1024 * 100; //Every 100 KiB
+        private const int BufferPerRead = BufferedRaiseThreshold;
+
+        private ManualResetEventSlim BufferedResetEvent { get; } = new ManualResetEventSlim(false);
+        private Exception StreamBufferingException { get; set; }
 
         public SeekableStream(Stream stream, long length)
         {
             Stream = stream;
             InternalBuffer = new byte[length];
+
+            BufferWholeStream();
         }
 
         private CancellationTokenSource ReadCancellationSource { get; } = new CancellationTokenSource();
@@ -43,9 +49,12 @@ namespace VMM.Player.Reader
         }
 
         public long BufferedBytes { get; private set; }
+        public event EventHandler<Exception> BufferingFailed;
         public override long Length => InternalBuffer.Length;
 
         public event EventHandler<long> Buffed;
+
+        public byte[] GetBuffer => InternalBuffer;
 
         public override void Flush()
         {
@@ -79,34 +88,60 @@ namespace VMM.Player.Reader
             throw new NotSupportedException();
         }
 
+        private async void BufferWholeStream()
+        {
+            try
+            {
+                var ct = ReadCancellationSource.Token;
+
+                while(BufferedBytes < Length)
+                {
+                    var needToRead = Math.Min(BufferedBytes + BufferPerRead, Length - BufferedBytes);
+                    var readed = await Stream.ReadAsync(InternalBuffer, (int)BufferedBytes, (int)needToRead, ct);
+                    BufferedBytes += readed;
+
+                    if(BufferedBytes - LastBufferedEventValue > BufferedRaiseThreshold)
+                    {
+                        OnBuffed(BufferedBytes);
+                        LastBufferedEventValue = BufferedBytes;
+                    }
+
+                    BufferedResetEvent.Set();
+                }
+            }
+            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
+            {
+                StreamBufferingException = new EndOfStreamException("Stream was closed because underlying WebRequest was canceled"
+                    , new OperationCanceledException("WebRequest was canceled", e));
+            }
+            catch(Exception e)
+            {
+                StreamBufferingException = new EndOfStreamException("Unable to read from stream", e);
+            }
+
+            if(StreamBufferingException != null)
+            {
+                OnBufferingFailed(StreamBufferingException);
+            }
+
+            OnBuffed(BufferedBytes);
+        }
+
         public override int Read(byte[] buffer, int offset, int count)
         {
-            if(BufferedBytes < InternalPosition + count)
+            if(StreamBufferingException != null)
             {
-                var needToRead = Math.Min(InternalPosition - BufferedBytes + count, InternalBuffer.Length - BufferedBytes);
-                try
+                throw new EndOfStreamException("Buffering failed with error", StreamBufferingException);
+            }
+
+            if(NeedWaitBuffer(count))
+            {
+                while(NeedWaitBuffer(count))
                 {
-                    while(needToRead > 0)
-                    {
-                        var readed = Stream.ReadAsync(InternalBuffer, (int)BufferedBytes, (int)needToRead, ReadCancellationSource.Token).Result;
-                        BufferedBytes += readed;
-                        needToRead -= readed;
-                    }
+                    BufferedResetEvent.Wait();
                 }
-                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
-                {
-                    throw new EndOfStreamException("Stream was closed because underlying WebRequest was canceled"
-                        , new OperationCanceledException("WebRequest was canceled", e));
-                }
-                catch(Exception e)
-                {
-                    throw new EndOfStreamException("Unable to read from stream", e);
-                }
-                if(BufferedBytes - LastBufferedEventValue > BufferedRaiseThreshold)
-                {
-                    OnBuffed(BufferedBytes);
-                    LastBufferedEventValue = BufferedBytes;
-                }
+
+                BufferedResetEvent.Reset();
             }
 
             var canRead = Math.Min(InternalBuffer.Length - InternalPosition, count);
@@ -116,6 +151,8 @@ namespace VMM.Player.Reader
 
             return (int)canRead;
         }
+
+        private bool NeedWaitBuffer(int bytesRequested) => BufferedBytes < Math.Min(InternalPosition + bytesRequested, Length);
 
         public override void Write(byte[] buffer, int offset, int count)
         {
@@ -133,6 +170,11 @@ namespace VMM.Player.Reader
         protected virtual void OnBuffed(long e)
         {
             Buffed?.Invoke(this, e);
+        }
+
+        protected virtual void OnBufferingFailed(Exception e)
+        {
+            BufferingFailed?.Invoke(this, e);
         }
     }
 }

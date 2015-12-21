@@ -107,7 +107,6 @@
     <Compile Include="Player\Reader\Mp3FileReaderEx.cs" />
     <Compile Include="Player\Helper\CacheHelper.cs" />
     <Compile Include="Helper\ColorSerializationHelper.cs" />
-    <Compile Include="Player\Reader\ReadAheadStream.cs" />
     <Compile Include="Player\Reader\SeekableStream.cs" />
     <Compile Include="Pages\Settings.xaml.cs">
       <DependentUpon>Settings.xaml</DependentUpon>

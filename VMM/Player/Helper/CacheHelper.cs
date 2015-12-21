@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Diagnostics;
 using System.IO;
 using System.Net;
 using System.Threading;
@@ -13,11 +12,8 @@ namespace VMM.Player.Helper
     public static class CacheHelper
     {
         private const string TempPath = "VMM/Cache";
-        private const int DefaultStreamReadBufferSize = 512 * 1024;
         private static readonly int ResponseTimeOut = (int)TimeSpan.FromSeconds(5).TotalMilliseconds;
 
-        private static readonly SemaphoreSlim CachingSyncSemaphore = new SemaphoreSlim(1);
-        private static HttpWebRequest CachingRequest { get; set; }
         private static HttpWebRequest PlayRequest { get; set; }
 
         public static async Task<Stream> Download(MusicEntry entry, CancellationToken ct)
@@ -44,7 +40,6 @@ namespace VMM.Player.Helper
                 }
             }
 
-            QueueCaching(entry, cacheFilePath);
             try
             {
                 PlayRequest?.Abort();
@@ -59,7 +54,11 @@ namespace VMM.Player.Helper
             {
                 var response = await PlayRequest.GetResponseAsync().WithTimeout(ResponseTimeOut, ct);
                 var songStream = response.GetResponseStream();
-                return new ReadAheadStream<SeekableStream>(new SeekableStream(songStream, response.ContentLength), DefaultStreamReadBufferSize);
+                var stream = new SeekableStream(songStream, response.ContentLength);
+
+                SaveWhenBuffered(stream, cacheFilePath);
+
+                return stream;
             }
             catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
             {
@@ -67,62 +66,45 @@ namespace VMM.Player.Helper
             }
         }
 
-        private static void QueueCaching(MusicEntry entry, string cacheFilePath)
+        private static void SaveWhenBuffered(IBufferedObservable observable, string filePath)
         {
-            try
-            {
-                CachingRequest?.Abort();
-            }
-            catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
-            {
-                //ignore
-            }
+            //Wrap delegate with array to capture modified closure
 
-            CachingRequest = WebRequest.CreateHttp(entry.Url);
+            EventHandler<long>[] onBuffered = {null};
+            EventHandler<Exception>[] onBufferingFailed = {null};
 
-            var thisRequest = CachingRequest;
-
-            CachingSyncSemaphore.WaitAsync().ContinueWith(async o =>
+            onBuffered[0] = async (sender, bufferedBytes) =>
             {
-                try
+                if(bufferedBytes == observable.Length)
                 {
-                    entry.IsLoading = true;
+                    var buffer = observable.GetBuffer;
 
-                    using(var response = await thisRequest.GetResponseAsync())
-                    using(var stream = response.GetResponseStream())
+                    using(var fileStream = new FileStream(filePath, FileMode.Create))
                     {
-                        if(response.ContentLength > 0)
-                        {
-                            using(var resultStream = new MemoryStream((int)response.ContentLength))
-                            {
-                                if(stream != null)
-                                {
-                                    await stream.CopyToAsync(resultStream);
+                        await fileStream.WriteAsync(buffer, 0, buffer.Length);
 
-                                    using(var fileStream = new FileStream(cacheFilePath, FileMode.Create))
-                                    {
-                                        resultStream.Position = 0;
-                                        await resultStream.CopyToAsync(fileStream);
-                                    }
-                                }
-                            }
-                        }
                     }
+
+                    observable.Buffed -= onBuffered[0];
+                    observable.BufferingFailed -= onBufferingFailed[0];
+
+                    onBuffered = null;
+                    onBufferingFailed = null;
                 }
-                catch(WebException e) when(e.Status == WebExceptionStatus.RequestCanceled)
-                {
-                    //ingore
-                }
-                catch(Exception e)
-                {
-                    Trace.WriteLine($"Unable to cache file: {e}");
-                }
-                finally
-                {
-                    entry.IsLoading = false;
-                    CachingSyncSemaphore.Release();
-                }
-            });
+            };
+
+            
+            onBufferingFailed[0] = (sender, exception) =>
+            {
+                observable.Buffed -= onBuffered[0];
+                observable.BufferingFailed -= onBufferingFailed[0];
+
+                onBuffered = null;
+                onBufferingFailed = null;
+            };
+
+            observable.Buffed += onBuffered[0];
+            observable.BufferingFailed += onBufferingFailed[0];
         }
     }
 }

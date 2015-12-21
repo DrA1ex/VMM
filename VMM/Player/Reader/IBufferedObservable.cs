@@ -6,8 +6,12 @@ namespace VMM.Player.Reader
     {
         event EventHandler<long> Buffed;
 
+        event EventHandler<Exception> BufferingFailed;
+
         long Length { get; }
 
         long BufferedBytes { get; }
+
+        byte[] GetBuffer { get; }
     }
 }
