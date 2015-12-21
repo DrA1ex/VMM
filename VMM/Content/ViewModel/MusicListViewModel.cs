@@ -22,6 +22,13 @@ using Application = System.Windows.Application;
 
 namespace VMM.Content.ViewModel
 {
+    internal enum PlaybackDirection
+    {
+        None,
+        Forward,
+        Backward
+    }
+
     public class MusicListViewModel : INotifyPropertyChanged
     {
         private readonly bool _isReadOnly;
@@ -46,10 +53,10 @@ namespace VMM.Content.ViewModel
         public MusicListViewModel()
         {
             MusicPlayer.Instance.PlaybackFinished += OnPlaybackFinished;
+            MusicPlayer.Instance.PlaybackFailed += OnPlaybackFailed;
             MusicPlayer.Instance.EntryPlayed += OnEntryPlayed;
             _isReadOnly = SettingsVault.Read().ReadOnly;
         }
-
 
         public ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new DelegateCommand(Refresh));
 
@@ -108,6 +115,8 @@ namespace VMM.Content.ViewModel
             }
         }
 
+        private PlaybackDirection LastPlaybackDirection { get; set; } = PlaybackDirection.None;
+
         public MusicEntry[] SelectedItems { get; set; }
 
         public List<MusicListChange> ChangesList => _changesList ?? (_changesList = new List<MusicListChange>());
@@ -132,7 +141,13 @@ namespace VMM.Content.ViewModel
 
         public ICommand SaveSelectedCommand => _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected));
 
-        public ICommand PlaySongCommand => _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlaySong));
+        public ICommand PlaySongCommand => _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlayCustomSong));
+
+        private void PlayCustomSong(MusicEntry entry)
+        {
+            LastPlaybackDirection = PlaybackDirection.None;
+            PlaySong(entry);
+        }
 
         public ICommand PlayNextCommand => _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext));
 
@@ -143,6 +158,18 @@ namespace VMM.Content.ViewModel
         private void OnPlaybackFinished(object sender, EventArgs args)
         {
             PlayNext();
+        }
+
+        private void OnPlaybackFailed(object sender, EventArgs e)
+        {
+            if(LastPlaybackDirection == PlaybackDirection.Backward)
+            {
+                PlayPrevious();
+            }
+            else
+            {
+                PlayNext();
+            }
         }
 
         private void SaveSelected(MusicEntry[] musicEntries)
@@ -268,7 +295,6 @@ namespace VMM.Content.ViewModel
             {
                 return;
             }
-
 
             song.IsDeleted = !song.IsDeleted;
 
@@ -403,6 +429,7 @@ namespace VMM.Content.ViewModel
 
             if(next != null)
             {
+                LastPlaybackDirection = PlaybackDirection.Forward;
                 PlaySong(next);
             }
         }
@@ -427,6 +454,7 @@ namespace VMM.Content.ViewModel
 
             if(previous != null)
             {
+                LastPlaybackDirection = PlaybackDirection.Backward;
                 PlaySong(previous);
             }
         }

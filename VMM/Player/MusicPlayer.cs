@@ -16,7 +16,7 @@ namespace VMM.Player
         private MusicPlayer()
         {
             Engine.PlaybackFinished += OnPlaybackFinished;
-            Engine.PlaybackFailed += (s, e) => OnPlaybackFinished(s, EventArgs.Empty);
+            Engine.PlaybackFailed += (s, e) => OnPlaybackFailed();
             Engine.Buffred += (sender, d) => Buffered = d;
 
             Engine.PlaybackStateChanged += EngineOnPlaybackStateChanged;
@@ -85,6 +85,7 @@ namespace VMM.Player
         }
 
         public event EventHandler PlaybackFinished;
+        public event EventHandler PlaybackFailed;
         public event EventHandler<MusicEntry> EntryPlayed;
 
         protected virtual void OnPlaybackFinished(object sender, EventArgs args)
@@ -128,6 +129,11 @@ namespace VMM.Player
         protected virtual void OnEntryPlayed(MusicEntry e)
         {
             EntryPlayed?.Invoke(this, e);
+        }
+
+        protected virtual void OnPlaybackFailed()
+        {
+            PlaybackFailed?.Invoke(this, EventArgs.Empty);
         }
     }
 }
