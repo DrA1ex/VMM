@@ -9,7 +9,7 @@ using System.Windows.Media.Imaging;
 using System.Xml.Linq;
 using System.Xml.XPath;
 
-namespace VMM
+namespace VMM.ImageLoader
 {
     /// <summary>
     ///     Provides an attached property determining the current Bing image and assigning it to an image or imagebrush.

@@ -23,10 +23,12 @@ namespace VMM.Content.ViewModel
         public SettingsAppearanceViewModel()
         {
             // add the default themes
-            _themes.Add(new Link { DisplayName = "Темная", Source = AppearanceManager.DarkThemeSource });
             _themes.Add(new Link { DisplayName = "Светлая", Source = AppearanceManager.LightThemeSource });
+            _themes.Add(new Link { DisplayName = "Темная", Source = AppearanceManager.DarkThemeSource });
 
             // add additional themes
+            _themes.Add(new Link { DisplayName = "Светлая с обложкой", Source = new Uri("/VMM;component/Assets/ModernUI.AlbumImage.White.xaml", UriKind.Relative) });
+            _themes.Add(new Link { DisplayName = "Темная с обложкой", Source = new Uri("/VMM;component/Assets/ModernUI.AlbumImage.Black.xaml", UriKind.Relative) });
             _themes.Add(new Link { DisplayName = "Бинг", Source = new Uri("/VMM;component/Assets/ModernUI.BingImage.xaml", UriKind.Relative) });
             _themes.Add(new Link { DisplayName = "Hello Kitty", Source = new Uri("/VMM;component/Assets/ModernUI.HelloKitty.xaml", UriKind.Relative) });
             _themes.Add(new Link { DisplayName = "Земля", Source = new Uri("/VMM;component/Assets/ModernUI.Earth.xaml", UriKind.Relative) });

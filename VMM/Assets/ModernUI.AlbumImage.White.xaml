@@ -1,6 +1,7 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-                    xmlns:imageLoader="clr-namespace:VMM.ImageLoader">
+                    xmlns:imageLoader="clr-namespace:VMM.ImageLoader"
+                    xmlns:utils="clr-namespace:VMM.Player">
 
     <ResourceDictionary.MergedDictionaries>
         <ResourceDictionary Source="/FirstFloor.ModernUI;component/Assets/ModernUI.Light.xaml" />
@@ -8,8 +9,13 @@
 
     <Rectangle x:Key="WindowBackgroundContent" x:Shared="false">
         <Rectangle.Fill>
-            <ImageBrush imageLoader:BingImage.UseBingImage="True" Opacity=".3" Stretch="UniformToFill" />
+            <ImageBrush
+                imageLoader:AlbumImage.Song="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong}"
+                Opacity=".3" Stretch="UniformToFill" />
         </Rectangle.Fill>
+        <Rectangle.Effect>
+            <BlurEffect Radius="3" RenderingBias="Performance" KernelType="Box" />
+        </Rectangle.Effect>
     </Rectangle>
 
 </ResourceDictionary>

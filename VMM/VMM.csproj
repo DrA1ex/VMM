@@ -83,7 +83,8 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
-    <Compile Include="BingImage.cs" />
+    <Compile Include="ImageLoader\AlbumImage.cs" />
+    <Compile Include="ImageLoader\BingImage.cs" />
     <Compile Include="Content\SettingsAppearance.xaml.cs">
       <DependentUpon>SettingsAppearance.xaml</DependentUpon>
     </Compile>
@@ -113,6 +114,14 @@
       <DependentUpon>Settings.xaml</DependentUpon>
     </Compile>
     <Compile Include="Player\MusicPlayer.cs" />
+    <Page Include="Assets\ModernUI.AlbumImage.Black.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.AlbumImage.White.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Assets\ModernUI.BingImage.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
