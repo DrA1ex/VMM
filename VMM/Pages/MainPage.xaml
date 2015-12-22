@@ -27,11 +27,18 @@
                                    Style="{DynamicResource Heading2}"
                                    HorizontalAlignment="Center" Margin="5" DockPanel.Dock="Top"
                                    TextWrapping="WrapWithOverflow" TextTrimming="CharacterEllipsis" />
-                        <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0"
-                                     Value="{Binding ElementName=MusicList, Path=DataContext.ProgressCurrentValue}"
-                                     Maximum="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue}"
-                                     IsIndeterminate="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue, Converter={StaticResource BoolInverter}}"
-                                     Height="20" />
+                        <Grid>
+                            <ProgressBar VerticalAlignment="Center" VerticalContentAlignment="Center" Margin="10,0"
+                                         Value="{Binding ElementName=MusicList, Path=DataContext.ProgressCurrentValue}"
+                                         Maximum="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue}"
+                                         Visibility="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue, Converter={StaticResource BoolToVisible}}"
+                                         Height="20" />
+                            <mui:ModernProgressRing Width="100" Height="100" VerticalAlignment="Center"
+                                                    HorizontalAlignment="Center"
+                                                    Style="{DynamicResource WaveProgressRingStyle}"
+                                                    IsActive="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue, Converter={StaticResource BoolInverter}}"
+                                                    Visibility="{Binding ElementName=MusicList, Path=DataContext.ProgressMaxValue, Converter={StaticResource BoolToVisible}, ConverterParameter=invert}" />
+                        </Grid>
                     </DockPanel>
                 </Border>
             </Border>
@@ -52,7 +59,8 @@
 
                 <DockPanel Grid.Row="2" HorizontalAlignment="Center">
                     <DockPanel.Resources>
-                        <Style BasedOn="{StaticResource {x:Type control:IconButton}}" TargetType="{x:Type control:IconButton}">
+                        <Style BasedOn="{StaticResource {x:Type control:IconButton}}"
+                               TargetType="{x:Type control:IconButton}">
                             <Setter Property="Margin" Value="5" />
                             <Setter Property="Height" Value="28" />
                             <Setter Property="Width" Value="28" />
