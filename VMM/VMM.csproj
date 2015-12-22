@@ -92,6 +92,7 @@
     <Compile Include="Control\BufferedSeekBar.xaml.cs">
       <DependentUpon>BufferedSeekBar.xaml</DependentUpon>
     </Compile>
+    <Compile Include="Control\IconButton.cs" />
     <Compile Include="Control\PlayerControl.xaml.cs">
       <DependentUpon>PlayerControl.xaml</DependentUpon>
     </Compile>
@@ -151,6 +152,10 @@
     <Page Include="Control\BufferedSeekBar.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\IconButtonStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Control\PlayerControl.xaml">
       <SubType>Designer</SubType>

@@ -39,7 +39,7 @@
 
         <Grid Style="{StaticResource ContentRoot}">
             <Grid Style="{StaticResource BusyBlurEffectStyle}"
-                Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
+                  Visibility="{Binding Source={x:Static model:Vk.Instance}, Path=LoggedIn, Converter={StaticResource BoolToVisible}}">
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto" />
                     <RowDefinition />
@@ -52,25 +52,21 @@
 
                 <DockPanel Grid.Row="2" HorizontalAlignment="Center">
                     <DockPanel.Resources>
-                        <Style TargetType="{x:Type mui:ModernButton}">
+                        <Style BasedOn="{StaticResource {x:Type control:IconButton}}" TargetType="{x:Type control:IconButton}">
                             <Setter Property="Margin" Value="5" />
-                            <Setter Property="EllipseDiameter" Value="24" />
-                            <Setter Property="IconHeight" Value="14" />
-                            <Setter Property="IconWidth" Value="14" />
+                            <Setter Property="Height" Value="28" />
+                            <Setter Property="Width" Value="28" />
                         </Style>
                     </DockPanel.Resources>
-                    <mui:ModernButton IconData="{StaticResource RefreshIcon}" ToolTip="Обновить"
-                                      EllipseDiameter="32" IconHeight="24" IconWidth="24" EllipseStrokeThickness="0"
-                                      Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}" />
-                    <mui:ModernButton IconData="{StaticResource SortIcon}" ToolTip="Сортировать"
-                                      Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"
-                                      CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"
-                                      EllipseDiameter="32" IconHeight="26" IconWidth="26" EllipseStrokeThickness="0"
-                                      Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}" />
-                    <mui:ModernButton IconData="{StaticResource ApplyIcon}" ToolTip="Сохранить изменения"
-                                      Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}"
-                                      EllipseDiameter="32" IconHeight="24" IconWidth="24" EllipseStrokeThickness="0"
-                                      Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}" />
+                    <control:IconButton Icon="{StaticResource RefreshIcon}" ToolTip="Обновить"
+                                        Command="{Binding ElementName=MusicList, Path=DataContext.RefreshCommand}" />
+                    <control:IconButton Icon="{StaticResource SortIcon}" ToolTip="Сортировать"
+                                        Command="{Binding ElementName=MusicList, Path=DataContext.SortCommand}"
+                                        CommandParameter="{Binding ElementName=MusicList, Path=SelectedItems}"
+                                        Visibility="{Binding ElementName=MusicList, Path=DataContext.CanEdit, Converter={StaticResource BoolToVisible}}" />
+                    <control:IconButton Icon="{StaticResource ApplyIcon}" ToolTip="Сохранить изменения"
+                                        Visibility="{Binding ElementName=MusicList, Path=DataContext.IsModified, Converter={StaticResource BoolToVisible}}"
+                                        Command="{Binding ElementName=MusicList, Path=DataContext.SaveChangesCommand}" />
                 </DockPanel>
             </Grid>
 
