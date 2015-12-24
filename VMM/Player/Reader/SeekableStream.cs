@@ -124,7 +124,10 @@ namespace VMM.Player.Reader
                 OnBufferingFailed(StreamBufferingException);
             }
 
-            OnBuffed(BufferedBytes);
+            if(LastBufferedEventValue != BufferedBytes)
+            {
+                OnBuffed(BufferedBytes);
+            }
         }
 
         public override int Read(byte[] buffer, int offset, int count)

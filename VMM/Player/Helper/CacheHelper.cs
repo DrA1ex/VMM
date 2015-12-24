@@ -77,19 +77,18 @@ namespace VMM.Player.Helper
             {
                 if(bufferedBytes == observable.Length)
                 {
-                    var buffer = observable.GetBuffer;
-
-                    using(var fileStream = new FileStream(filePath, FileMode.Create))
-                    {
-                        await fileStream.WriteAsync(buffer, 0, buffer.Length);
-
-                    }
-
                     observable.Buffed -= onBuffered[0];
                     observable.BufferingFailed -= onBufferingFailed[0];
 
                     onBuffered = null;
                     onBufferingFailed = null;
+
+                    var buffer = observable.GetBuffer;
+
+                    using(var fileStream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await fileStream.WriteAsync(buffer, 0, buffer.Length);
+                    }
                 }
             };
 
