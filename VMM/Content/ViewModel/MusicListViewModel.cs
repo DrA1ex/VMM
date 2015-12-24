@@ -5,7 +5,6 @@ using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Net;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -14,19 +13,25 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using FirstFloor.ModernUI.Windows.Controls;
 using VkNet.Enums;
-using VkNet.Model;
-using VkNet.Model.Attachments;
 using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
 using VMM.Model;
-using VMM.Utils;
+using VMM.Player;
 using Application = System.Windows.Application;
 
 namespace VMM.Content.ViewModel
 {
+    internal enum PlaybackDirection
+    {
+        None,
+        Forward,
+        Backward
+    }
+
     public class MusicListViewModel : INotifyPropertyChanged
     {
+        private readonly bool _isReadOnly;
         private string _busyText;
         private List<MusicListChange> _changesList;
         private bool _isBusy;
@@ -45,24 +50,17 @@ namespace VMM.Content.ViewModel
         private MusicEntry _selectedSong;
         private ICommand _sortCommand;
 
-        private bool _isReadOnly;
-
         public MusicListViewModel()
         {
-            MusicPlayer.Instance.PlaybackStopped += delegate { PlayNext(); };
+            MusicPlayer.Instance.PlaybackFinished += OnPlaybackFinished;
+            MusicPlayer.Instance.PlaybackFailed += OnPlaybackFailed;
+            MusicPlayer.Instance.EntryPlayed += OnEntryPlayed;
             _isReadOnly = SettingsVault.Read().ReadOnly;
         }
 
+        public ICommand RefreshCommand => _refreshCommand ?? (_refreshCommand = new DelegateCommand(Refresh));
 
-        public ICommand RefreshCommand
-        {
-            get { return _refreshCommand ?? (_refreshCommand = new DelegateCommand(Refresh)); }
-        }
-
-        public ObservableCollection<MusicEntry> Music
-        {
-            get { return _music ?? (_music = new ObservableCollection<MusicEntry>()); }
-        }
+        public ObservableCollection<MusicEntry> Music => _music ?? (_music = new ObservableCollection<MusicEntry>());
 
         public bool IsBusy
         {
@@ -70,14 +68,11 @@ namespace VMM.Content.ViewModel
             set
             {
                 _isBusy = value;
-                OnPropertyChanged("IsBusy");
+                OnPropertyChanged(nameof(IsBusy));
             }
         }
 
-        public bool CanEdit
-        {
-            get { return !_isReadOnly; }
-        }
+        public bool CanEdit => !_isReadOnly;
 
         public string BusyText
         {
@@ -85,7 +80,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _busyText = value;
-                OnPropertyChanged("BusyText");
+                OnPropertyChanged(nameof(BusyText));
             }
         }
 
@@ -95,7 +90,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _progressMaxValue = value;
-                OnPropertyChanged("ProgressMaxValue");
+                OnPropertyChanged(nameof(ProgressMaxValue));
             }
         }
 
@@ -105,7 +100,7 @@ namespace VMM.Content.ViewModel
             set
             {
                 _progressCurrentValue = value;
-                OnPropertyChanged("ProgressCurrentValue");
+                OnPropertyChanged(nameof(ProgressCurrentValue));
             }
         }
 
@@ -116,16 +111,15 @@ namespace VMM.Content.ViewModel
             set
             {
                 _isModified = value;
-                OnPropertyChanged("IsModified");
+                OnPropertyChanged(nameof(IsModified));
             }
         }
 
+        private PlaybackDirection LastPlaybackDirection { get; set; } = PlaybackDirection.None;
+
         public MusicEntry[] SelectedItems { get; set; }
 
-        public List<MusicListChange> ChangesList
-        {
-            get { return _changesList ?? (_changesList = new List<MusicListChange>()); }
-        }
+        public List<MusicListChange> ChangesList => _changesList ?? (_changesList = new List<MusicListChange>());
 
         public MusicEntry SelectedSong
         {
@@ -133,115 +127,113 @@ namespace VMM.Content.ViewModel
             set
             {
                 _selectedSong = value;
-                OnPropertyChanged("SelectedSong");
+                OnPropertyChanged(nameof(SelectedSong));
             }
         }
 
-        public ICommand RemoveCommand
+        public ICommand RemoveCommand => _removeCommand ?? (_removeCommand = new DelegateCommand<MusicEntry>(Remove));
+
+        public ICommand SortCommand => _sortCommand ?? (_sortCommand = new DelegateCommand<MusicEntry[]>(Sort));
+
+        public ICommand SaveChangesCommand => _saveChangesCommand ?? (_saveChangesCommand = new DelegateCommand(SaveChanges));
+
+        public ICommand RemoveSelectedCommand => _removeSelectedCommand ?? (_removeSelectedCommand = new DelegateCommand<MusicEntry[]>(RemoveSelected));
+
+        public ICommand SaveSelectedCommand => _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected));
+
+        public ICommand PlaySongCommand => _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlayCustomSong));
+
+        private void PlayCustomSong(MusicEntry entry)
         {
-            get { return _removeCommand ?? (_removeCommand = new DelegateCommand<MusicEntry>(Remove)); }
+            LastPlaybackDirection = PlaybackDirection.None;
+            PlaySong(entry);
         }
 
-        public ICommand SortCommand
-        {
-            get { return _sortCommand ?? (_sortCommand = new DelegateCommand<MusicEntry[]>(Sort)); }
-        }
+        public ICommand PlayNextCommand => _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext));
 
-        public ICommand SaveChangesCommand
-        {
-            get { return _saveChangesCommand ?? (_saveChangesCommand = new DelegateCommand(SaveChanges)); }
-        }
-
-        public ICommand RemoveSelectedCommand
-        {
-            get { return _removeSelectedCommand ?? (_removeSelectedCommand = new DelegateCommand<MusicEntry[]>(RemoveSelected)); }
-        }
-
-        public ICommand SaveSelectedCommand
-        {
-            get { return _saveSelectedCommand ?? (_saveSelectedCommand = new DelegateCommand<MusicEntry[]>(SaveSelected)); }
-        }
-
-        public ICommand PlaySongCommand
-        {
-            get { return _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlaySong)); }
-        }
-
-        public ICommand PlayNextCommand
-        {
-            get { return _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext)); }
-        }
-
-        public ICommand PlayPreviousCommand
-        {
-            get { return _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious)); }
-        }
+        public ICommand PlayPreviousCommand => _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious));
 
         public event PropertyChangedEventHandler PropertyChanged;
 
+        private void OnPlaybackFinished(object sender, EventArgs args)
+        {
+            PlayNext();
+        }
+
+        private void OnPlaybackFailed(object sender, EventArgs e)
+        {
+            if(LastPlaybackDirection == PlaybackDirection.Backward)
+            {
+                PlayPrevious();
+            }
+            else
+            {
+                PlayNext();
+            }
+        }
+
         private void SaveSelected(MusicEntry[] musicEntries)
         {
-            if (musicEntries == null || musicEntries.Length == 0)
+            if(musicEntries == null || musicEntries.Length == 0)
             {
                 return;
             }
 
             var dlg = new FolderBrowserDialog();
-            DialogResult result = dlg.ShowDialog();
+            var result = dlg.ShowDialog();
 
-            if (result != DialogResult.OK)
+            if(result != DialogResult.OK)
             {
                 return;
             }
 
             IsBusy = true;
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, выполняется сохранение выбранных песен...";
             ProgressMaxValue = musicEntries.Length;
             ProgressCurrentValue = 0;
 
-            string savePath = dlg.SelectedPath;
+            var savePath = dlg.SelectedPath;
 
             Task.Run(() =>
-                     {
-                         try
-                         {
-                             WebClient client = Vk.Instance.Client;
+            {
+                try
+                {
+                    var client = Vk.Instance.Client;
 
-                             foreach (MusicEntry song in musicEntries)
-                             {
-                                 string fileName = String.Format("{0}.mp3",
-                                     new String(String.Format("{0} - {1}", song.Artist, song.Name).Where(c => !"><|?*/\\:\"".Contains(c)).ToArray()));
+                    foreach(var song in musicEntries)
+                    {
+                        var fileName = $"{new string($"{song.Artist} - {song.Name}".Where(c => !"><|?*/\\:\"".Contains(c)).ToArray())}.mp3";
 
-                                 string filePath = Path.Combine(savePath, fileName);
-                                 if (!File.Exists(filePath))
-                                 {
-                                     lock (client)
-                                     {
-                                         client.DownloadFile(song.Url, filePath);
-                                     }
-                                 }
+                        var filePath = Path.Combine(savePath, fileName);
+                        if(!File.Exists(filePath))
+                        {
+                            lock(client)
+                            {
+                                client.DownloadFile(song.Url, filePath);
+                            }
+                        }
 
-                                 disp.Invoke(() => { ++ProgressCurrentValue; });
-                             }
-                         }
-                         catch (Exception e)
-                         {
-                             Trace.WriteLine(String.Format("While saving file: {0}", e));
+                        uiDispatcher.Invoke(() => { ++ProgressCurrentValue; });
+                    }
+                }
+                catch(Exception e)
+                {
+                    Trace.WriteLine($"While saving file: {e}");
 
-                             disp.Invoke(() => { ModernDialog.ShowMessage("Во время сохранения произошла ошибка :(", "Не удалось сохранить файл", MessageBoxButton.OK); });
-                         }
-                         finally
-                         {
-                             disp.Invoke(() => { IsBusy = false; });
-                         }
-                     });
+                    uiDispatcher.Invoke(() => { ModernDialog.ShowMessage("Во время сохранения произошла ошибка :(", "Не удалось сохранить файл", MessageBoxButton.OK); });
+                }
+                finally
+                {
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
+                }
+            });
         }
 
         private void RemoveSelected(MusicEntry[] musicEntries)
         {
-            foreach (MusicEntry entry in musicEntries)
+            foreach(var entry in musicEntries)
             {
                 entry.IsDeleted = true;
             }
@@ -254,62 +246,61 @@ namespace VMM.Content.ViewModel
             ChangesList.Clear();
             IsModified = false;
 
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, обновляется список музыки...";
             ProgressMaxValue = 0;
             ProgressCurrentValue = 0;
 
             Task.Factory.StartNew(() =>
-                                  {
-                                      try
-                                      {
-                                          ReadOnlyCollection<AudioAlbum> albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
-                                          ReadOnlyCollection<Audio> musicList = Vk.Instance.Api.Audio.Get((ulong)Vk.Instance.UserId);
+            {
+                try
+                {
+                    var albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
+                    var musicList = Vk.Instance.Api.Audio.Get((ulong)Vk.Instance.UserId);
 
-                                          foreach (Audio musicEntry in musicList)
-                                          {
-                                              Audio song = musicEntry;
+                    foreach(var musicEntry in musicList)
+                    {
+                        var song = musicEntry;
 
-                                              var entry = new MusicEntry
-                                                          {
-                                                              Id = (ulong)song.Id,
-                                                              Artist = song.Artist,
-                                                              Name = song.Title,
-                                                              Genre = song.Genre ?? AudioGenre.Other,
-                                                              Duration = song.Duration,
-                                                              Url = song.Url,
-                                                          };
+                        var entry = new MusicEntry
+                        {
+                            Id = (ulong)song.Id,
+                            Artist = song.Artist,
+                            Name = song.Title,
+                            Genre = song.Genre ?? AudioGenre.Other,
+                            Duration = song.Duration,
+                            Url = song.Url
+                        };
 
-                                              if (song.AlbumId.HasValue)
-                                              {
-                                                  entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
-                                              }
+                        if(song.AlbumId.HasValue)
+                        {
+                            entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
+                        }
 
-                                              disp.BeginInvoke(new Action(() => Music.Add(entry)));
-                                          }
-                                      }
-                                      finally
-                                      {
-                                          disp.Invoke(() => { IsBusy = false; });
-                                      }
-                                  });
+                        uiDispatcher.BeginInvoke(new Action(() => Music.Add(entry)));
+                    }
+                }
+                finally
+                {
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
+                }
+            });
         }
 
 
         private void Remove(MusicEntry song)
         {
-            if (IsBusy)
+            if(IsBusy)
             {
                 return;
             }
 
-
             song.IsDeleted = !song.IsDeleted;
 
-            if (song.IsDeleted)
+            if(song.IsDeleted)
             {
-                ChangesList.Add(new MusicListChange { ChangeType = ChangeType.Deleted, Data = new DeleteSong { SongId = song.Id } });
+                ChangesList.Add(new MusicListChange {ChangeType = ChangeType.Deleted, Data = new DeleteSong {SongId = song.Id}});
                 IsModified = true;
             }
             else
@@ -320,46 +311,46 @@ namespace VMM.Content.ViewModel
 
         private void Sort(MusicEntry[] selectedItems)
         {
-            var dlg = new SortSettings { Owner = Application.Current.MainWindow };
-            bool? result = dlg.ShowDialog();
+            var dlg = new SortSettings {Owner = Application.Current.MainWindow};
+            var result = dlg.ShowDialog();
 
-            if (result != true)
+            if(result != true)
             {
                 return;
             }
 
-            SortingPath[] sortingPaths = dlg.SortingPaths;
+            var sortingPaths = dlg.SortingPaths;
 
 
-            List<MusicEntry> musicEntries = Music.ToList();
+            var musicEntries = Music.ToList();
             var selectedEntries = (MusicEntry[])selectedItems.Clone();
             Music.Clear();
 
             IsBusy = true;
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, выполняется сортировка...";
             ProgressMaxValue = 0;
             ProgressCurrentValue = 0;
 
             Task.Run(() =>
-                     {
-                         MusicEntry[] itemsToSort = selectedEntries.Length > 1 ? selectedEntries : musicEntries.ToArray();
-                         int startPosition = musicEntries.IndexOf(itemsToSort.First());
-                         musicEntries.RemoveAll(itemsToSort.Contains);
+            {
+                var itemsToSort = selectedEntries.Length > 1 ? selectedEntries : musicEntries.ToArray();
+                var startPosition = musicEntries.IndexOf(itemsToSort.First());
+                musicEntries.RemoveAll(itemsToSort.Contains);
 
-                         IEnumerable<MusicEntry> sorted = SortHelper.Sort(itemsToSort, sortingPaths);
+                var sorted = SortHelper.Sort(itemsToSort, sortingPaths);
 
-                         musicEntries.InsertRange(startPosition, sorted);
+                musicEntries.InsertRange(startPosition, sorted);
 
-                         foreach (MusicEntry musicEntry in musicEntries)
-                         {
-                             MusicEntry entry = musicEntry;
-                             disp.BeginInvoke(new Action(() => Music.Add(entry)));
-                         }
+                foreach(var musicEntry in musicEntries)
+                {
+                    var entry = musicEntry;
+                    uiDispatcher.BeginInvoke(new Action(() => Music.Add(entry)));
+                }
 
-                         disp.Invoke(() => { IsBusy = false; });
-                     });
+                uiDispatcher.Invoke(() => { IsBusy = false; });
+            });
 
             IsModified = true;
         }
@@ -367,111 +358,100 @@ namespace VMM.Content.ViewModel
         private void SaveChanges()
         {
             IsBusy = true;
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var uiDispatcher = Dispatcher.CurrentDispatcher;
 
             BusyText = "Подождите, применяются изменения...";
             ProgressMaxValue = Music.Count + ChangesList.Count - 1;
             ProgressCurrentValue = 0;
 
             Task.Run(() =>
-                     {
-                         try
-                         {
-                             //TODO: Optimize reorder requests
-                             for (int i = 0; i < Music.Count; i++)
-                             {
-                                 MusicEntry entry = Music[i];
-                                 ulong previosId = i != 0 ? Music[i - 1].Id : 0;
-                                 ulong nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
+            {
+                try
+                {
+                    //TODO: Optimize reorder requests
+                    for(var i = 0; i < Music.Count; i++)
+                    {
+                        var entry = Music[i];
+                        var previousId = i != 0 ? Music[i - 1].Id : 0;
+                        var nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
 
-                                 Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previosId, (long)nextId);
+                        Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previousId, (long)nextId);
 
-                                 disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+                        uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 
-                                 Thread.Sleep(340); //Allowed only 3 request per second
-                             }
+                        Thread.Sleep(340); //Allowed only 3 request per second
+                    }
 
-                             foreach (MusicListChange change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
-                             {
-                                 Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
+                    foreach(var change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
+                    {
+                        Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
 
-                                 disp.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
+                        uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 
-                                 Thread.Sleep(340);
-                             }
-                         }
-                         finally
-                         {
-                             disp.Invoke(() => { IsBusy = false; });
-                             disp.BeginInvoke(new Action(Refresh));
-                         }
-                     });
+                        Thread.Sleep(340);
+                    }
+                }
+                finally
+                {
+                    uiDispatcher.Invoke(() => { IsBusy = false; });
+                    uiDispatcher.BeginInvoke(new Action(Refresh));
+                }
+            });
         }
 
         private void PlaySong(MusicEntry musicEntry)
         {
-            if (musicEntry == null)
+            if(musicEntry == null)
             {
                 musicEntry = Music.FirstOrDefault();
             }
 
-            if (MusicPlayer.Instance.CurrentSong != null && MusicPlayer.Instance.CurrentSong != musicEntry)
-                MusicPlayer.Instance.Stop();
-
-            if (musicEntry != null)
+            if(musicEntry != null)
             {
-                Task.Run(() =>
-                         {
-                             lock (MusicPlayer.Instance)
-                                 MusicPlayer.Instance.Play(musicEntry);
-                         });
+                MusicPlayer.Instance.Play(musicEntry);
             }
         }
 
         private void PlayNext()
         {
-            if (MusicPlayer.Instance.CurrentSong != null)
-                MusicPlayer.Instance.Stop();
+            var current = MusicPlayer.Instance.CurrentSong;
 
-            MusicEntry current = MusicPlayer.Instance.CurrentSong;
-
-            int currentIndex = Music.IndexOf(current);
+            var currentIndex = Music.IndexOf(current);
             MusicEntry next = null;
-            if (currentIndex >= 0 && currentIndex < Music.Count - 1)
+            if(currentIndex >= 0 && currentIndex < Music.Count - 1)
             {
                 next = Music[currentIndex + 1];
             }
-            else if (currentIndex == Music.Count - 1)
+            else if(currentIndex == Music.Count - 1)
             {
                 next = Music.FirstOrDefault();
             }
 
-            if (next != null)
+            if(next != null)
             {
+                LastPlaybackDirection = PlaybackDirection.Forward;
                 PlaySong(next);
             }
         }
 
         private void PlayPrevious()
         {
-            if (MusicPlayer.Instance.CurrentSong != null)
-                MusicPlayer.Instance.Stop();
+            var current = MusicPlayer.Instance.CurrentSong;
 
-            MusicEntry current = MusicPlayer.Instance.CurrentSong;
-
-            int currentIndex = Music.IndexOf(current);
+            var currentIndex = Music.IndexOf(current);
             MusicEntry previous = null;
-            if (currentIndex > 0 && currentIndex < Music.Count)
+            if(currentIndex > 0 && currentIndex < Music.Count)
             {
                 previous = Music[currentIndex - 1];
             }
-            else if (currentIndex == 0)
+            else if(currentIndex == 0)
             {
                 previous = Music.LastOrDefault();
             }
 
-            if (previous != null)
+            if(previous != null)
             {
+                LastPlaybackDirection = PlaybackDirection.Backward;
                 PlaySong(previous);
             }
         }
@@ -479,20 +459,24 @@ namespace VMM.Content.ViewModel
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged(string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
-            {
-                handler(this, new PropertyChangedEventArgs(propertyName));
-            }
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
         }
 
         public void MoveSong(int srcIndex, int targetIndex)
         {
-            if (srcIndex != targetIndex)
+            if(srcIndex != targetIndex)
             {
                 Music.Move(srcIndex, targetIndex);
                 IsModified = true;
             }
+        }
+
+        public event EventHandler<MusicEntry> EntryPlayed;
+
+        protected virtual void OnEntryPlayed(object sender, MusicEntry musicEntry)
+        {
+            EntryPlayed?.Invoke(sender, musicEntry);
         }
     }
 }

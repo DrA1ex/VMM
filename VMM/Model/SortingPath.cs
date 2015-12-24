@@ -9,56 +9,6 @@ namespace VMM.Model
     {
         private bool _descending;
 
-        #region Predefined SortingPaths
-        public static SortingPath Artist
-        {
-            get
-            {
-                return new SortingPath
-                       {
-                           Expression = entry => entry.Artist,
-                           DisplayName = "Исполнитель"
-                       };
-            }
-        }
-
-        public static SortingPath Name
-        {
-            get
-            {
-                return new SortingPath
-                       {
-                           Expression = entry => entry.Name,
-                           DisplayName = "Название"
-                       };
-            }
-        }
-
-        public static SortingPath Album
-        {
-            get
-            {
-                return new SortingPath
-                       {
-                           Expression = entry => entry.Album != null ? entry.Album.Title : null,
-                           DisplayName = "Альбом"
-                       };
-            }
-        }
-
-        public static SortingPath Genre
-        {
-            get
-            {
-                return new SortingPath
-                       {
-                           Expression = entry => (int)entry.Genre,
-                           DisplayName = "Жанр"
-                       };
-            }
-        }
-        #endregion
-
         public Func<MusicEntry, object> Expression { get; set; }
 
         public string DisplayName { get; set; }
@@ -69,7 +19,7 @@ namespace VMM.Model
             set
             {
                 _descending = value;
-                OnPropertyChanged("Descending");
+                OnPropertyChanged(nameof(Descending));
             }
         }
 
@@ -78,11 +28,60 @@ namespace VMM.Model
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            handler?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
+
+        #region Predefined SortingPaths
+
+        public static SortingPath Artist
+        {
+            get
             {
-                handler(this, new PropertyChangedEventArgs(propertyName));
+                return new SortingPath
+                {
+                    Expression = entry => entry.Artist,
+                    DisplayName = "Исполнитель"
+                };
             }
         }
+
+        public static SortingPath Name
+        {
+            get
+            {
+                return new SortingPath
+                {
+                    Expression = entry => entry.Name,
+                    DisplayName = "Название"
+                };
+            }
+        }
+
+        public static SortingPath Album
+        {
+            get
+            {
+                return new SortingPath
+                {
+                    Expression = entry => entry.Album?.Title,
+                    DisplayName = "Альбом"
+                };
+            }
+        }
+
+        public static SortingPath Genre
+        {
+            get
+            {
+                return new SortingPath
+                {
+                    Expression = entry => (int)entry.Genre,
+                    DisplayName = "Жанр"
+                };
+            }
+        }
+
+        #endregion
     }
 }

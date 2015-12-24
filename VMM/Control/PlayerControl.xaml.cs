@@ -2,7 +2,6 @@
 
 namespace VMM.Control
 {
-
     public partial class PlayerControl : UserControl
     {
         public PlayerControl()

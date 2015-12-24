@@ -55,7 +55,9 @@
     <Reference Include="System" />
     <Reference Include="System.Data" />
     <Reference Include="System.Drawing" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
+    <Reference Include="System.Windows.Interactivity, Version=4.5.0.0, Culture=neutral, PublicKeyToken=31bf3856ad364e35, processorArchitecture=MSIL" />
     <Reference Include="System.Xml" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Core" />
@@ -81,15 +83,65 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="ImageLoader\AlbumImage.cs" />
+    <Compile Include="ImageLoader\BingImage.cs" />
+    <Compile Include="Content\SettingsAppearance.xaml.cs">
+      <DependentUpon>SettingsAppearance.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Content\ViewModel\SettingsAppearanceViewModel.cs" />
+    <Compile Include="Control\Behavior\ScrollIntoViewBehavior.cs" />
+    <Compile Include="Control\BufferedSeekBar.xaml.cs">
+      <DependentUpon>BufferedSeekBar.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Control\IconButton.cs" />
     <Compile Include="Control\PlayerControl.xaml.cs">
       <DependentUpon>PlayerControl.xaml</DependentUpon>
     </Compile>
     <Compile Include="Control\SeekBar.xaml.cs">
       <DependentUpon>SeekBar.xaml</DependentUpon>
     </Compile>
-    <Compile Include="Converters\BoolToPlayIconConverter.cs" />
-    <Compile Include="Helper\CacheHelper.cs" />
-    <Compile Include="Utils\MusicPlayer.cs" />
+    <Compile Include="Converters\OrCompositeConverter.cs" />
+    <Compile Include="Helper\TaskHelper.cs" />
+    <Compile Include="Helper\VisualTreeHelperEx.cs" />
+    <Compile Include="Player\Exceptions\MusicPlayerEngineException.cs" />
+    <Compile Include="Player\MusicPlayerEngine.cs" />
+    <Compile Include="Player\Reader\IBufferedObservable.cs" />
+    <Compile Include="Player\Reader\Mp3FileReaderEx.cs" />
+    <Compile Include="Player\Helper\CacheHelper.cs" />
+    <Compile Include="Helper\ColorSerializationHelper.cs" />
+    <Compile Include="Player\Reader\SeekableStream.cs" />
+    <Compile Include="Pages\Settings.xaml.cs">
+      <DependentUpon>Settings.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="Player\MusicPlayer.cs" />
+    <Page Include="Assets\ModernUI.AlbumImage.Black.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.AlbumImage.White.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.BingImage.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.HelloKitty.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.Earth.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Assets\ModernUI.Snowflakes.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
+    <Page Include="Content\SettingsAppearance.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
     <Page Include="Content\View\Login.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -105,6 +157,14 @@
     <Page Include="Content\View\MusicListView.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\BufferedSeekBar.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
+    <Page Include="Control\IconButtonStyle.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
     </Page>
     <Page Include="Control\PlayerControl.xaml">
       <SubType>Designer</SubType>
@@ -122,7 +182,6 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </Page>
-    <Compile Include="Converters\BoolToSaveIconConverter.cs" />
     <Compile Include="Content\ViewModel\LoginInfoViewModel.cs" />
     <Compile Include="Content\ViewModel\LoginViewModel.cs" />
     <Compile Include="Content\ViewModel\MusicEntryViewModel.cs" />
@@ -181,14 +240,22 @@
     </Compile>
     <Compile Include="Properties\Annotations.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Page Include="Pages\Settings.xaml">
+      <Generator>MSBuild:Compile</Generator>
+      <SubType>Designer</SubType>
+    </Page>
   </ItemGroup>
   <ItemGroup>
     <None Include="app.config" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <Resource Include="Assets\background.kitty.png" />
+    <Resource Include="Assets\background.snowflakes.jpg" />
+    <Resource Include="Assets\background.earth.jpg" />
     <Content Include="Icon.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

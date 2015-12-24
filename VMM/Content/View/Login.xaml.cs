@@ -1,5 +1,4 @@
-﻿using System;
-using System.Windows;
+﻿using System.Windows;
 using FirstFloor.ModernUI.Windows.Controls;
 using VMM.Content.ViewModel;
 
@@ -20,10 +19,7 @@ namespace VMM.Content.View
             DataContext = Model;
         }
 
-        public LoginViewModel Model
-        {
-            get { return _model ?? (_model = new LoginViewModel()); }
-        }
+        public LoginViewModel Model => _model ?? (_model = new LoginViewModel());
 
         private string GetPasswordMethod()
         {
@@ -32,14 +28,14 @@ namespace VMM.Content.View
 
         private void AuthorizationSuccess()
         {
-            PasswordBox.Password = String.Empty;
+            PasswordBox.Password = string.Empty;
         }
 
         private void AuthorizationFailed(string s)
         {
-            ModernDialog.ShowMessage(String.Format("Авторизация не удалась: {0}", s), "Ошибка входа", MessageBoxButton.OK);
+            ModernDialog.ShowMessage(string.Format("Авторизация не удалась: {0}", s), "Ошибка входа", MessageBoxButton.OK);
 
-            PasswordBox.Password = String.Empty;
+            PasswordBox.Password = string.Empty;
         }
     }
 }

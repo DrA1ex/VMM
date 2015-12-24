@@ -13,9 +13,6 @@ namespace VMM.Content.View
             DataContext = Model;
         }
 
-        public LoginInfoViewModel Model
-        {
-            get { return _model ?? (_model = new LoginInfoViewModel()); }
-        }
+        public LoginInfoViewModel Model => _model ?? (_model = new LoginInfoViewModel());
     }
 }

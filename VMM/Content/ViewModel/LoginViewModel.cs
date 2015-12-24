@@ -13,21 +13,17 @@ namespace VMM.Content.ViewModel
 {
     public class LoginViewModel : INotifyPropertyChanged
     {
+        private bool _isBusy;
+        private ICommand _loginCommand;
         public Action<string> AuthorizationFailed = s => { };
         public Action AuthorizationSuccess = () => { };
         public Func<string> GetPasswordMethod = () => null;
 
-        private bool _isBusy;
-        private ICommand _loginCommand;
-
-        public ICommand LoginCommand
-        {
-            get { return _loginCommand ?? (_loginCommand = new DelegateCommand(Login)); }
-        }
+        public ICommand LoginCommand => _loginCommand ?? (_loginCommand = new DelegateCommand(Login));
 
         public string Email { get; set; }
 
-        public bool ReadOnlyAccess { get; set; }    
+        public bool ReadOnlyAccess { get; set; }
 
         public bool IsBusy
         {
@@ -44,39 +40,39 @@ namespace VMM.Content.ViewModel
         private void Login()
         {
             IsBusy = true;
-            Dispatcher disp = Dispatcher.CurrentDispatcher;
+            var disp = Dispatcher.CurrentDispatcher;
 
             Task.Run(() =>
-                     {
-                         try
-                         {
-                             AuthorizationResults results = Vk.Instance.Authorize(Email, GetPasswordMethod(), ReadOnlyAccess);
+            {
+                try
+                {
+                    var results = Vk.Instance.Authorize(Email, GetPasswordMethod(), ReadOnlyAccess);
 
-                             if (results.Success)
-                             {
-                                 disp.Invoke(() => AuthorizationSuccess());
-                             }
-                             else
-                             {
-                                 disp.Invoke(() => AuthorizationFailed(results.Message));
-                             }
-                         }
-                         catch (Exception e)
-                         {
-                             Trace.WriteLine(String.Format("While logging in: {0}", e));
-                         }
-                         finally
-                         {
-                             disp.Invoke(() => { IsBusy = false; });
-                         }
-                     });
+                    if(results.Success)
+                    {
+                        disp.Invoke(() => AuthorizationSuccess());
+                    }
+                    else
+                    {
+                        disp.Invoke(() => AuthorizationFailed(results.Message));
+                    }
+                }
+                catch(Exception e)
+                {
+                    Trace.WriteLine(string.Format("While logging in: {0}", e));
+                }
+                finally
+                {
+                    disp.Invoke(() => { IsBusy = false; });
+                }
+            });
         }
 
         [NotifyPropertyChangedInvocator]
         protected virtual void OnPropertyChanged([CallerMemberName] string propertyName = null)
         {
-            PropertyChangedEventHandler handler = PropertyChanged;
-            if (handler != null)
+            var handler = PropertyChanged;
+            if(handler != null)
             {
                 handler(this, new PropertyChangedEventArgs(propertyName));
             }

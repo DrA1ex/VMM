@@ -9,13 +9,13 @@
              xmlns:view="clr-namespace:VMM.Content.View"
              xmlns:viewModel="clr-namespace:VMM.Content.ViewModel"
              xmlns:componentModel="clr-namespace:System.ComponentModel;assembly=PresentationFramework"
-             mc:Ignorable="d" 
-             d:DataContext="{d:DesignInstance viewModel:MusicEntryViewModel}" 
-             x:Name="Self"
-             d:DesignHeight="50" d:DesignWidth="435">
+             xmlns:control="clr-namespace:VMM.Control"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance viewModel:MusicEntryViewModel}"
+             d:DesignHeight="50" d:DesignWidth="366.508">
     <UserControl.Resources>
         <converters:DurationConverter x:Key="DurationConverterResource" />
-        <model:MusicEntryDesign x:Key="MusicEntryDesign"/>
+        <model:MusicEntryDesign x:Key="MusicEntryDesign" />
 
         <Style TargetType="UserControl">
             <Style.Triggers>
@@ -28,13 +28,13 @@
     </UserControl.Resources>
 
     <Grid x:Name="Grid" d:DataContext="{Binding Source={StaticResource MusicEntryDesign}}"
-          Background="{Binding IsDeleted, Converter={StaticResource IsRemovedToBrush}}">
+          Background="{Binding IsDeleted, Converter={StaticResource IsRemovedToBrush}}"
+          Width="{Binding RelativeSource={RelativeSource AncestorType={x:Type UserControl}}, Path=ActualWidth}"
+          HorizontalAlignment="Right">
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="Auto" />
-            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition />
+            <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
 
         <Grid.RowDefinitions>
@@ -42,45 +42,46 @@
             <RowDefinition />
         </Grid.RowDefinitions>
 
-        <mui:ModernButton Grid.RowSpan="2" EllipseDiameter="24" IconHeight="10" IconWidth="10" 
-                          VerticalAlignment="Center" Margin="3"
-                          IconData="{Binding IsPlaying, Converter={StaticResource BoolToPlayIcon}}"
-                          Command="{Binding Path=DataContext.PlaySongCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
-                          CommandParameter="{Binding}"/>
+        <control:IconButton Grid.RowSpan="2"
+                            VerticalAlignment="Center" Margin="3"
+                            Command="{Binding Path=DataContext.PlaySongCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
+                            CommandParameter="{Binding}"
+                            Style="{StaticResource EntryPlayingIconStyle}" />
 
-        <TextBlock Text="{Binding Artist}" Margin="3" FontWeight="Bold" Foreground="{DynamicResource ButtonText}"
-                   Grid.Row="0" Grid.Column="1" />
-        <TextBlock Grid.Row="0" Grid.Column="2" Text="—" Margin="3" Foreground="{DynamicResource ButtonText}" />
-        <TextBlock Grid.Row="0" Grid.Column="3" Text="{Binding Name}" TextTrimming="CharacterEllipsis" Margin="3"
-                   Foreground="{DynamicResource ButtonText}" />
-        <DockPanel Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="4">
-            <TextBlock Text="{Binding Album.Title}" Margin="3" Foreground="{DynamicResource ModernButtonBorder}" />
-            <TextBlock Text="{Binding Genre, StringFormat=({0})}" Margin="3"
+        <TextBlock Margin="3,3,15,3" Foreground="{DynamicResource ButtonText}"
+                   Grid.Row="0" Grid.Column="1" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis">
+            <Run Text="{Binding Artist, Mode=OneWay}" FontWeight="Bold" />
+            <Run Text="—" FontWeight="Bold" />
+            <Run Text="{Binding Name, Mode=OneWay}" />
+        </TextBlock>
+        <TextBlock Grid.Row="1" Grid.Column="1" Margin="3" Foreground="{DynamicResource ItemText}">
+            <Run Text="{Binding Album.Title, Mode=OneWay}" />
+            <Run Text="{Binding Genre, StringFormat=({0}), Mode=OneWay}" />
+        </TextBlock>
+        <Grid Grid.Row="0" Grid.Column="2" Grid.RowSpan="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="Auto" />
+            </Grid.ColumnDefinitions>
+
+            <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3"
+                       VerticalAlignment="Center"
                        Foreground="{DynamicResource ModernButtonBorder}" />
-        </DockPanel>
-        <DockPanel Grid.Row="0" Grid.Column="4" Grid.RowSpan="2" HorizontalAlignment="Right" VerticalAlignment="Center">
-            <TextBlock Text="{Binding Duration, Converter={StaticResource DurationConverterResource}}" Margin="3" VerticalAlignment="Center"
-                       Foreground="{DynamicResource ModernButtonBorder}" />
 
-            <mui:ModernButton EllipseDiameter="24" IconHeight="14" IconWidth="14"
-                              VerticalAlignment="Center" Margin="3"
-                          Command="{Binding Path=DataContext.SaveSongCommand, ElementName=Self}"
-                          CommandParameter="{Binding .}"
-                          IsEnabled="{Binding ElementName=Self, Path=DataContext.SavingInProgress, Converter={StaticResource BoolInverter}}">
-                <mui:ModernButton.IconData>
-                    <MultiBinding Converter="{StaticResource BoolToIcon}">
-                        <Binding ElementName="Self" Path="DataContext.SavingInProgress" />
-                        <Binding Path="IsLoading"/>
-                    </MultiBinding>
-                </mui:ModernButton.IconData>
-            </mui:ModernButton>
+            <StackPanel Grid.Column="1" x:Name="ActionsDock"
+                        d:DataContext="{d:DesignInstance viewModel:MusicEntryViewModel}" Orientation="Horizontal">
+                <control:IconButton
+                    VerticalAlignment="Center" Margin="3"
+                    Command="{Binding SaveSongCommand}"
+                    CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType={x:Type view:MusicEntryView}}}"
+                    IsEnabled="{Binding SavingInProgress, Converter={StaticResource BoolInverter}}"
+                    Style="{StaticResource EntrySaveIconStyle}" />
 
-            <mui:ModernButton Margin="3" EllipseDiameter="24" IconHeight="14" IconWidth="14"
-                              IconData="{StaticResource RemoveIcon}"
-                              Command="{Binding Path=DataContext.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
-                              Visibility="{Binding Path=DataContext.CanEdit, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}, Converter={StaticResource BoolToVisible}}"
-                              CommandParameter="{Binding}" />
-        </DockPanel>
-
+                <control:IconButton Margin="3" Icon="{StaticResource RemoveIcon}"
+                                    Command="{Binding Path=DataContext.RemoveCommand, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}}"
+                                    Visibility="{Binding Path=DataContext.CanEdit, RelativeSource={RelativeSource AncestorType={x:Type view:MusicListView}}, Converter={StaticResource BoolToVisible}}"
+                                    CommandParameter="{Binding Path=DataContext, RelativeSource={RelativeSource AncestorType={x:Type view:MusicEntryView}}}" />
+            </StackPanel>
+        </Grid>
     </Grid>
 </UserControl>

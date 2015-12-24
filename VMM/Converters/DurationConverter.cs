@@ -8,10 +8,10 @@ namespace VMM.Converters
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {
-            if (value is int)
+            if(value is int)
             {
-                var duration = (int) value;
-                return String.Format("{0}:{1:00}", duration/60, duration%60);
+                var duration = (int)value;
+                return string.Format("{0}:{1:00}", duration / 60, duration % 60);
             }
 
             return "#err";

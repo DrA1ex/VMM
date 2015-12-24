@@ -4,7 +4,7 @@ using System.Windows.Data;
 
 namespace VMM.Converters
 {
-    class NullToBooleanConverter : IValueConverter
+    internal class NullToBooleanConverter : IValueConverter
     {
         public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
         {

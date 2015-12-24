@@ -36,7 +36,7 @@ namespace VMM.Helper
 
         public void Execute(object parameter)
         {
-            _action((T) parameter);
+            _action((T)parameter);
         }
 
         public bool CanExecute(object parameter)

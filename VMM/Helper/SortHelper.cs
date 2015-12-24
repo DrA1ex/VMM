@@ -8,18 +8,18 @@ namespace VMM.Helper
     {
         public static IEnumerable<MusicEntry> Sort(IEnumerable<MusicEntry> enumerable, SortingPath[] paths)
         {
-            if (paths == null || paths.Length == 0)
+            if(paths == null || paths.Length == 0)
             {
                 return enumerable;
             }
 
             var firstSortPath = paths.First();
-            IOrderedEnumerable<MusicEntry> sortable = firstSortPath.Descending
+            var sortable = firstSortPath.Descending
                 ? enumerable.OrderByDescending(firstSortPath.Expression)
                 : enumerable.OrderBy(firstSortPath.Expression);
 
             var additionalPaths = paths.Skip(1);
-            foreach (var sortingPath in additionalPaths)
+            foreach(var sortingPath in additionalPaths)
             {
                 sortable = sortingPath.Descending
                     ? sortable.ThenByDescending(sortingPath.Expression)
