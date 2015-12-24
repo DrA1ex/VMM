@@ -131,6 +131,10 @@ namespace VMM.Player.Reader
         {
             if(StreamBufferingException != null)
             {
+                if(StreamBufferingException is EndOfStreamException)
+                {
+                    throw StreamBufferingException;
+                }
                 throw new EndOfStreamException("Buffering failed with error", StreamBufferingException);
             }
 
