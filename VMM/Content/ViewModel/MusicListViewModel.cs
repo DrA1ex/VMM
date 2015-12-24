@@ -436,9 +436,6 @@ namespace VMM.Content.ViewModel
 
         private void PlayPrevious()
         {
-            if(MusicPlayer.Instance.CurrentSong != null)
-                MusicPlayer.Instance.Stop();
-
             var current = MusicPlayer.Instance.CurrentSong;
 
             var currentIndex = Music.IndexOf(current);
