@@ -8,6 +8,8 @@ Vk (Vkontakte) Music Manager
 
 ![alt tag](https://hsto.org/files/a1b/f2e/316/a1bf2e316beb47df9850dceb00dbfd4d.png)
 
+![alt tag](https://habrastorage.org/files/b8d/431/13d/b8d43113d7b5446bbd1352d0c27895aa.png)
+
 
 Основные функции:
 
