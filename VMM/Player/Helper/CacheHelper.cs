@@ -32,7 +32,7 @@ namespace VMM.Player.Helper
 
                 try
                 {
-                    return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read);
+                    return new FileStream(cacheFilePath, FileMode.Open, FileAccess.Read, FileShare.Read);
                 }
                 finally
                 {

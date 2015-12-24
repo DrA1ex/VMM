@@ -14,7 +14,7 @@
                 Opacity=".3" Stretch="UniformToFill" />
         </Rectangle.Fill>
         <Rectangle.Effect>
-            <BlurEffect Radius="3" RenderingBias="Performance" KernelType="Box" />
+            <BlurEffect Radius="3" RenderingBias="Performance" KernelType="Gaussian" />
         </Rectangle.Effect>
     </Rectangle>
 
