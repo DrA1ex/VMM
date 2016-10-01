@@ -13,6 +13,8 @@ using System.Windows.Input;
 using System.Windows.Threading;
 using FirstFloor.ModernUI.Windows.Controls;
 using VkNet.Enums;
+using VkNet.Model;
+using VkNet.Model.RequestParams;
 using VMM.Annotations;
 using VMM.Dialog;
 using VMM.Helper;
@@ -257,7 +259,9 @@ namespace VMM.Content.ViewModel
                 try
                 {
                     var albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
-                    var musicList = Vk.Instance.Api.Audio.Get((ulong)Vk.Instance.UserId);
+                    User user = null;
+                    var musicList = Vk.Instance.Api.Audio.Get(out user, new AudioGetParams());
+                    long surrogateIndexes = long.MaxValue;
 
                     foreach(var musicEntry in musicList)
                     {
@@ -265,7 +269,7 @@ namespace VMM.Content.ViewModel
 
                         var entry = new MusicEntry
                         {
-                            Id = (ulong)song.Id,
+                            Id = song.Id ?? --surrogateIndexes,
                             Artist = song.Artist,
                             Name = song.Title,
                             Genre = song.Genre ?? AudioGenre.Other,
@@ -275,7 +279,7 @@ namespace VMM.Content.ViewModel
 
                         if(song.AlbumId.HasValue)
                         {
-                            entry.Album = albums.Single(c => c.AlbumId == song.AlbumId.Value);
+                            entry.Album = albums.SingleOrDefault(c => c.AlbumId == song.AlbumId.Value);
                         }
 
                         uiDispatcher.BeginInvoke(new Action(() => Music.Add(entry)));
@@ -300,12 +304,12 @@ namespace VMM.Content.ViewModel
 
             if(song.IsDeleted)
             {
-                ChangesList.Add(new MusicListChange {ChangeType = ChangeType.Deleted, Data = new DeleteSong {SongId = song.Id}});
+                ChangesList.Add(new MusicListChange {ChangeType = ChangeType.Deleted, Data = new DeleteSong {SongId = (ulong)song.Id}});
                 IsModified = true;
             }
             else
             {
-                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong)c.Data).SongId == song.Id);
+                ChangesList.RemoveAll(c => c.ChangeType == ChangeType.Deleted && ((DeleteSong)c.Data).SongId == (ulong)song.Id);
             }
         }
 
@@ -384,7 +388,7 @@ namespace VMM.Content.ViewModel
 
                     foreach(var change in ChangesList.Where(c => c.ChangeType == ChangeType.Deleted))
                     {
-                        Vk.Instance.Api.Audio.Delete(((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
+                        Vk.Instance.Api.Audio.Delete((long)((DeleteSong)change.Data).SongId, Vk.Instance.UserId);
 
                         uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 

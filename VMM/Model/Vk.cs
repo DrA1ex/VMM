@@ -124,11 +124,13 @@ namespace VMM.Model
                 Api.Authorize(AccessToken);
 
                 // ReSharper disable once ReturnValueOfPureMethodIsNotUsed
-                Api.Users.IsAppUser(UserId); //Dummy call, throw exception if authorization failed
+                if(Api.IsAuthorized)
+                {
+                    LoggedIn = true;
+                    return new AuthorizationResults {Success = true};
+                }
 
-                LoggedIn = true;
-
-                return new AuthorizationResults {Success = true};
+                return new AuthorizationResults { Success = false };
             }
             catch(Exception e)
             {

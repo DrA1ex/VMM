@@ -11,11 +11,18 @@
         <Rectangle.Fill>
             <ImageBrush
                 imageLoader:AlbumImage.Song="{Binding Source={x:Static utils:MusicPlayer.Instance}, Path=CurrentSong}"
-                Opacity=".3" Stretch="UniformToFill" />
+                Opacity="0.7" Stretch="UniformToFill">
+            </ImageBrush>
         </Rectangle.Fill>
         <Rectangle.Effect>
-            <BlurEffect Radius="3" RenderingBias="Performance" KernelType="Gaussian" />
+            <BlurEffect Radius="35" RenderingBias="Quality" KernelType="Gaussian" />
         </Rectangle.Effect>
+        <Rectangle.OpacityMask>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                <GradientStop Offset="0" Color="Transparent"/>
+                <GradientStop Offset="1" Color="White"/>
+            </LinearGradientBrush>
+        </Rectangle.OpacityMask>
     </Rectangle>
 
 </ResourceDictionary>

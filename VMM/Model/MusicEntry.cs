@@ -12,7 +12,7 @@ namespace VMM.Model
         private bool _isLoading;
         private bool _isPlaying;
         private bool _modified;
-        public ulong Id { get; set; }
+        public long Id { get; set; }
 
         public string Artist { get; set; }
 
