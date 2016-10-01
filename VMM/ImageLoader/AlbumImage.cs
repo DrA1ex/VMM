@@ -2,6 +2,7 @@
 using System.IO;
 using System.Linq;
 using System.Net;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -15,9 +16,9 @@ namespace VMM.ImageLoader
 {
     public static class AlbumImage
     {
-        private const string RequestPattern = @"https://www.google.ru/search?q={0}&safe=off&tbm=isch&tbs=isz:l&cad=h";
-        private const string UrlPrefix = "imgurl=";
-        private const string UrlPostfix = "&amp;imgrefurl=";
+        private const string RequestPattern = @"https://www.bing.com/images/search?q={0}&qft=+filterui:imagesize-large";
+        private const string UrlPrefix = "imgurl:&quot;";
+        private const string UrlPostfix = "&quot;";
 
         private const string TempPath = "VMM/Cache/Covers";
         private const int StreamCopyBufferSize = 81920;
@@ -188,9 +189,9 @@ namespace VMM.ImageLoader
                 using(var stream = response.GetResponseStream())
                 {
                     var doc = new HtmlDocument();
-                    doc.Load(stream);
-                    return doc.DocumentNode.SelectNodes("//a[@target='_blank']")
-                        .Select(c => c.GetAttributeValue("href", null))
+                    doc.Load(stream, Encoding.UTF8);
+                    return doc.DocumentNode.SelectNodes("//div[@class='dg_u']//a/@m")
+                        .Select(c => c.GetAttributeValue("m", null))
                         .Select(ExtractUri)
                         .Where(c => c != null)
                         .Take(5)
@@ -205,18 +206,18 @@ namespace VMM.ImageLoader
             return null;
         }
 
-        private static Uri ExtractUri(string href)
+        private static Uri ExtractUri(string value)
         {
-            if(!string.IsNullOrWhiteSpace(href))
+            if(!string.IsNullOrWhiteSpace(value))
             {
-                var startPos = href.IndexOf(UrlPrefix, StringComparison.Ordinal);
-                var endPos = href.IndexOf(UrlPostfix, StringComparison.Ordinal);
+                var startPos = value.IndexOf(UrlPrefix, StringComparison.Ordinal);
+                var endPos = value.IndexOf(UrlPostfix, startPos + UrlPrefix.Length, StringComparison.Ordinal);
 
                 if(startPos != -1 && endPos != -1)
                 {
                     var firstSymbolIndex = startPos + UrlPrefix.Length;
                     var length = endPos - firstSymbolIndex;
-                    var url = href.Substring(firstSymbolIndex, length);
+                    var url = value.Substring(firstSymbolIndex, length);
 
                     return new Uri(url, UriKind.Absolute);
                 }
