@@ -30,6 +30,7 @@ echo Collecting binaries
 rmdir bin /s/q >nul 2>&1
 
 xcopy VMM\bin\Release\VMM.exe bin\*.* > nul
+xcopy VMM\bin\Release\VMM.exe.config bin\*.* > nul
 xcopy VMM\bin\Release\*.dll bin\*.* > nul
 
 echo Done
