@@ -1,4 +1,6 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
@@ -21,6 +23,8 @@ using VMM.Helper;
 using VMM.Model;
 using VMM.Player;
 using Application = System.Windows.Application;
+
+#endregion
 
 namespace VMM.Content.ViewModel
 {
@@ -145,17 +149,17 @@ namespace VMM.Content.ViewModel
 
         public ICommand PlaySongCommand => _playSongCommand ?? (_playSongCommand = new DelegateCommand<MusicEntry>(PlayCustomSong));
 
-        private void PlayCustomSong(MusicEntry entry)
-        {
-            LastPlaybackDirection = PlaybackDirection.None;
-            PlaySong(entry);
-        }
-
         public ICommand PlayNextCommand => _playNextCommand ?? (_playNextCommand = new DelegateCommand(PlayNext));
 
         public ICommand PlayPreviousCommand => _playPreviousCommand ?? (_playPreviousCommand = new DelegateCommand(PlayPrevious));
 
         public event PropertyChangedEventHandler PropertyChanged;
+
+        private void PlayCustomSong(MusicEntry entry)
+        {
+            LastPlaybackDirection = PlaybackDirection.None;
+            PlaySong(entry);
+        }
 
         private void OnPlaybackFinished(object sender, EventArgs args)
         {
@@ -203,6 +207,7 @@ namespace VMM.Content.ViewModel
                 try
                 {
                     var client = Vk.Instance.Client;
+                    var failedEntries = new List<Tuple<MusicEntry, Exception>>();
 
                     foreach(var song in musicEntries)
                     {
@@ -213,11 +218,29 @@ namespace VMM.Content.ViewModel
                         {
                             lock(client)
                             {
-                                client.DownloadFile(song.Url, filePath);
+                                try
+                                {
+                                    client.DownloadFile(song.Url, filePath);
+                                }
+                                catch(Exception e)
+                                {
+                                    failedEntries.Add(Tuple.Create(song, e));
+                                }
                             }
                         }
 
                         uiDispatcher.Invoke(() => { ++ProgressCurrentValue; });
+                    }
+
+                    if(failedEntries.Count > 0)
+                    {
+                        var groups = failedEntries.GroupBy(t => t.Item2.GetType());
+                        var messages = string.Join(Environment.NewLine,
+                            groups.SelectMany(c => c.Select(e => $"{e.Item1.Artist} - {e.Item1.Name}: {e.Item2.Message}")));
+                        Trace.WriteLine($"While saving files: ${messages}");
+
+                        uiDispatcher.Invoke(
+                            () => { ModernDialog.ShowMessage($"Во время сохранения произошли ошибки: {messages}", "Не все файлы были сохранены", MessageBoxButton.OK); });
                     }
                 }
                 catch(Exception e)
@@ -259,9 +282,9 @@ namespace VMM.Content.ViewModel
                 try
                 {
                     var albums = Vk.Instance.Api.Audio.GetAlbums(Vk.Instance.UserId);
-                    User user = null;
+                    User user;
                     var musicList = Vk.Instance.Api.Audio.Get(out user, new AudioGetParams());
-                    long surrogateIndexes = long.MaxValue;
+                    var surrogateIndexes = long.MaxValue;
 
                     foreach(var musicEntry in musicList)
                     {
@@ -379,7 +402,7 @@ namespace VMM.Content.ViewModel
                         var previousId = i != 0 ? Music[i - 1].Id : 0;
                         var nextId = i < Music.Count - 1 ? Music[i + 1].Id : 0;
 
-                        Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, (long)previousId, (long)nextId);
+                        Vk.Instance.Api.Audio.Reorder(entry.Id, Vk.Instance.UserId, previousId, nextId);
 
                         uiDispatcher.BeginInvoke(new Action(() => { ++ProgressCurrentValue; }));
 
